@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProvinceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Agrupación de rutas con protección de sanctum
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Rutas sin protección con sactum
+Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('getProvinces'); // La direccion sería api/provinces

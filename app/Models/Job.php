@@ -17,12 +17,12 @@ class Job extends Model
     }
 
     // Relación 1:Muchos con JobCategory (1 jobcategory puede pertenecer a varias ofertas de empleo)
-    public function jobcategories(): BelongsTo{
+    public function jobcategory(): BelongsTo{
         return $this->belongsTo(Jobcategory::class);
     }
 
     // Relación 1:Muchos con Provinces (1 provincia puede pertenecer a varias ofertas de empleo)
-    public function provinces(): BelongsTo{
+    public function province(): BelongsTo{
         return $this->belongsTo(Province::class);
     }
 }

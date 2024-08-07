@@ -13,7 +13,7 @@ class JobSeeder extends Seeder
      */
     public function run(): void
     {
-        /* Job::create([
+        Job::create([
             'puesto' => 'Programador/a web',
             'jobcategory_id' => 1,
             'province_id' => 7,
@@ -22,8 +22,9 @@ class JobSeeder extends Seeder
             'modalidad' => 'Híbrido',
             'descripcion' => 'Se busca programador/a web para nuestra tienda en Málaga. Sus funciones serán las de mantener nuestra plataforma de e-commerce y resolver problemas derivados de la misma.',
             'requisitos' => 'El candidato/a debe tener conocimientos demostrables en Angular y Laravel, pues son las herramientas usadas en nuestra plataforma.',
-            'beneficios' => 'Se ofrece salario acorde al convenio de informática. Horario flexible y teletrabajo. Ticket restaurante y seguro médico privado.'
-        ]); */
+            'beneficios' => 'Se ofrece salario acorde al convenio de informática. Horario flexible y teletrabajo. Ticket restaurante y seguro médico privado.',
+            'salario' => '2000 €/mes'
+        ]);
 
         Job::create([
             'puesto' => 'Comercial de marketing',
@@ -34,7 +35,8 @@ class JobSeeder extends Seeder
             'modalidad' => 'Presencial',
             'descripcion' => 'Se busca comercial para realizar contratos de nuestros servicios de márketing para la zona de Carretera de Cádiz. El candidato asesorará al cliente durante todo el proceso de venta.',
             'requisitos' => 'El candidato/a debe poseer don de gentes y tener experiencia de al menos 1 año en puesto relacionado. Orientado a resultados.',
-            'beneficios' => 'Se ofrece salario fijo más variables por objeticos. Horario flexible.'
+            'beneficios' => 'Se ofrece salario fijo más variables por objeticos. Horario flexible.',
+            'salario' => '1500 €/mes'
         ]);
     }
 }

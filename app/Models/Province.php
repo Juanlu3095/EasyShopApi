@@ -10,6 +10,11 @@ class Province extends Model
 {
     use HasFactory;
 
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
+
     // Relación 1:Muchos con Provinces (1 provincia puede pertenecer a varias ofertas de empleo)
     public function jobs(): HasMany{
         return $this->hasMany(Job::class);

@@ -1,9 +1,12 @@
 <?php
 
-use App\Http\Controllers\JobController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProvinceController;
+use App\Http\Controllers\JobcategoryController;
+use App\Http\Controllers\CvController;
+use App\Http\Controllers\JobController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,5 +26,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Rutas sin protección con sactum
 Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('getProvinces'); // La direccion sería api/provinces
+Route::resource('/jobcategories', JobcategoryController::class);
 
 Route::resource('/jobs', JobController::class);
+Route::resource('/cvs', CvController::class);

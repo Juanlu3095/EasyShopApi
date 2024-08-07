@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('descripcion');
             $table->text('requisitos');
             $table->text('beneficios');
+            $table->string('salario');
             $table->timestamps();
         });
     }

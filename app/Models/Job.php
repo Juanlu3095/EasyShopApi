@@ -11,6 +11,10 @@ class Job extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'puesto', 'jobcategory_id', 'province_id', 'jornada', 'nivel_profesional', 'modalidad', 'descripcion', 'requisitos', 'beneficios', 'salario'
+    ];
+
     // Relación 1:Muchos con Job (1 Oferta de empleo tiene varios CVs)
     public function cvs(): HasMany{
         return $this->hasMany(Cv::class);

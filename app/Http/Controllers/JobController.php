@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\JobResource;
 use Illuminate\Http\Request;
 use App\Models\Job;
+use Illuminate\Http\JsonResponse;
 
 class JobController extends Controller
 {
@@ -33,7 +34,12 @@ class JobController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $job = Job::create($request->all()); // Usar fillable en el modelo Job
+
+        return response()->json([
+            'success' => true,
+            'data' => new JobResource($job)
+        ], 201);
     }
 
     /**
@@ -56,9 +62,25 @@ class JobController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id): JsonResponse
     {
-        //
+        $job = Job::find($id);
+        $job->puesto = $request->puesto;
+        $job->jobcategory_id = $request->jobcategory_id;
+        $job->province_id = $request->province_id;
+        $job->jornada = $request->jornada;
+        $job->nivel_profesional = $request->nivel_profesional;
+        $job->modalidad = $request->modalidad;
+        $job->descripcion = $request->descripcion;
+        $job->requisitos = $request->requisitos;
+        $job->beneficios = $request->beneficios;
+        $job->salario = $request->salario;
+        $job->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => new JobResource($job)
+        ], 200);
     }
 
     /**
@@ -66,6 +88,9 @@ class JobController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Job::find($id)->delete();
+        return response()->json([
+            'success' => true
+        ], 200);
     }
 }

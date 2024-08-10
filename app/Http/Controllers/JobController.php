@@ -11,11 +11,11 @@ use Illuminate\Http\JsonResponse;
 class JobController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource in desc order by id
      */
     public function index()
     {
-        $jobs = Job::all();
+        $jobs = Job::orderBy('id', 'desc')->get();
 
         return response()->json(JobResource::collection($jobs), 200);
         
@@ -89,6 +89,17 @@ class JobController extends Controller
     public function destroy(string $id)
     {
         Job::find($id)->delete();
+        return response()->json([
+            'success' => true
+        ], 200);
+    }
+
+    /**
+     * Remove the specified array of resources from storage. Se podría usar directamnete destroy() para eliminar tanto la selección como una única id
+     */
+    public function destroySelected(string $idArray)
+    {
+        Job::destroy(explode(",",$idArray));
         return response()->json([
             'success' => true
         ], 200);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Jobcategory;
+use App\Http\Resources\JobcategoryResource;
 
 class JobcategoryController extends Controller
 {
@@ -31,7 +32,12 @@ class JobcategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $jobcategories = Jobcategory::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'data' => new JobcategoryResource($jobcategories)
+        ], 201);
     }
 
     /**
@@ -39,7 +45,8 @@ class JobcategoryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $jobcategory = Jobcategory::find($id);
+        return new JobcategoryResource(($jobcategory));
     }
 
     /**
@@ -55,14 +62,25 @@ class JobcategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $jobcategory = Jobcategory::find($id);
+        $jobcategory->nombre = $request->nombre;
+        $jobcategory->slug = $request->slug;
+        $jobcategory->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => new JobcategoryResource($jobcategory)
+        ], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. Se eliminan tanto arrays como sólo un sólo id.
      */
     public function destroy(string $id)
     {
-        //
+        Jobcategory::destroy(explode(",", $id));
+        return response()->json([
+            'success' => true
+        ], 200);
     }
 }

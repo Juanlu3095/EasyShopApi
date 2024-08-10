@@ -1,12 +1,12 @@
-name: pull requests
+#name: pull requests
 
-on:
-  pull_request_target:
-    types: [opened]
+#on:
+#  pull_request_target:
+#    types: [opened]
 
-permissions:
-  pull-requests: write
+#permissions:
+#  pull-requests: write
 
-jobs:
-  uneditable:
-    uses: laravel/.github/.github/workflows/pull-requests.yml@main
+#jobs:
+#  uneditable:
+#    uses: laravel/.github/.github/workflows/pull-requests.yml@main

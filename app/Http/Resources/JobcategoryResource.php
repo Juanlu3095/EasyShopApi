@@ -17,7 +17,7 @@ class JobcategoryResource extends JsonResource
         return [
             'id' => $this->id, 
             'nombre' =>  $this->nombre, 
-            
+            'slug' => $this->slug
         ];
     }
 }

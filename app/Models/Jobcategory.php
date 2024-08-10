@@ -10,6 +10,8 @@ class Jobcategory extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['nombre', 'slug'];
+
     protected $hidden = [
         'created_at',
         'updated_at'

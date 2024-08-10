@@ -31,7 +31,7 @@ class JobResource extends JsonResource
             'requisitos' => $this->requisitos,
             'beneficios' => $this->beneficios,
             'salario' => $this->salario,
-            'fecha' => $this->created_at->format('Y-m-d') // Damos formato a la fecha
+            'fecha' => $this->updated_at->format('Y-m-d') // Damos formato a la fecha
         ];
     }
 }

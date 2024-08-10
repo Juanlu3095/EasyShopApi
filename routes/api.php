@@ -29,4 +29,6 @@ Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('get
 Route::resource('/jobcategories', JobcategoryController::class);
 
 Route::resource('/jobs', JobController::class);
+Route::delete('/jobs/selected/{id}', [JobController::class, 'destroySelected'])->name('destroySelectedJobs'); // Permite borrar jobs seleccionados
+
 Route::resource('/cvs', CvController::class);

@@ -20,11 +20,13 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            UserSeeder::class,
+            /* UserSeeder::class,
             RoleSeeder::class,
             ProvinceSeeder::class,
             JobcategorySeeder::class,
-            JobSeeder::class
+            JobSeeder::class, 
+            MessageSeeder::class, */
+            NewsletterSeeder::class
         ]);
     }
 }

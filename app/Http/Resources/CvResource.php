@@ -14,6 +14,18 @@ class CvResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'apellidos' => $this->apellidos,
+            'telefono' => $this->telefono,
+            'email' => $this->email,
+            'ruta_cv' => $this->ruta_cv,
+            'incorporacion' => $this->incorporacion,
+            'pais' => $this->pais,
+            'ciudad' => $this->ciudad,
+            'fecha' => $this->created_at,
+            'estado_candidatura' => $this->estado_candidatura
+        ];
     }
 }

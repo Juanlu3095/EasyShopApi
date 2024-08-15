@@ -7,6 +7,8 @@ use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\JobcategoryController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NewsletterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,3 +34,8 @@ Route::resource('/jobs', JobController::class);
 Route::delete('/jobs/selected/{id}', [JobController::class, 'destroySelected'])->name('destroySelectedJobs'); // Permite borrar jobs seleccionados
 
 Route::resource('/cvs', CvController::class);
+Route::get('/cvs/empleo/{idEmpleo}', [CvController::class, 'indexByJob'])->name('showCVsbyJob'); // Obtiene los CVs inscritos a una oferta de empleo específica
+
+Route::resource('/messages', MessageController::class);
+
+Route::resource('/newsletters', NewsletterController::class);

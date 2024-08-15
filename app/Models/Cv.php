@@ -11,7 +11,7 @@ class Cv extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nombre', 'apellidos', 'email', 'telefono', 'ruta_cv', 'incorporacion', 'pais', 'ciudad', 'politica', 'job_id'
+        'nombre', 'apellidos', 'email', 'telefono', 'ruta_cv', 'incorporacion', 'pais', 'ciudad', 'politica', 'estado_candidatura', 'job_id'
     ];
 
     // Relación 1:Muchos con Job (1 Oferta de empleo tiene varios CVs)

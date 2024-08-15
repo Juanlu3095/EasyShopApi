@@ -11,19 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cvs', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
             $table->string('apellidos');
-            $table->integer('telefono');
             $table->string('email');
-            $table->string('ruta_cv');
-            $table->string('incorporacion');
-            $table->string('pais');
-            $table->string('ciudad');
-            $table->string('politica');
-            $table->string('estado_candidatura')->default('En proceso');
-            $table->unsignedBigInteger('job_id'); // Relación 1:Muchos con la tabla Jobs
+            $table->string('asunto');
+            $table->text('mensaje');
             $table->timestamps();
         });
     }
@@ -33,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cvs');
+        Schema::dropIfExists('messages');
     }
 };

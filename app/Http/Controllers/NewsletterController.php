@@ -3,29 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CvResource;
+use App\Http\Resources\NewsletterResource;
+use App\Models\Newsletter;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use App\Models\Cv;
 
-class CvController extends Controller
+class NewsletterController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $cvs = Cv::orderBy('created_at', 'desc')->get();
-        return response()->json(CvResource::collection($cvs), 200);
-    }
-
-    /**
-     * Display a listing of CVs based on specific Job.
-     */
-    public function indexByJob(int $idJob)
-    {
-        $cvs = Cv::where('job_id', $idJob)->orderBy('created_at', 'desc')->get();
-        return response()->json(CvResource::collection($cvs), 200);
+        $newsletters = Newsletter::orderBy('created_at', 'desc')->get();
+        return response()->json(NewsletterResource::collection($newsletters), 200);
     }
 
     /**
@@ -39,13 +29,9 @@ class CvController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $cv = Cv::create($request->all());
-        return response()->json([
-            'success' => true,
-            'data' => $cv
-        ], 201);
+        //
     }
 
     /**

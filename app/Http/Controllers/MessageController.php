@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MessageResource;
 use App\Models\Message;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
@@ -29,13 +30,13 @@ class MessageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $mensaje = Message::create($request->all());
 
         return response()->json([
             'success' => true,
-            'data' => $mensaje
+            'data' => new MessageResource($mensaje)
         ], 201);
     }
 
@@ -44,7 +45,8 @@ class MessageController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $mensaje = Message::find($id);
+        return new MessageResource($mensaje);
     }
 
     /**
@@ -60,14 +62,32 @@ class MessageController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $mensaje = Message::find($id);
+        $mensaje->update($request->all()); // Asegurarnos de que $fillable esté bien definido en el modelo
+        $mensaje->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => new MessageResource($mensaje)
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $idArray)
     {
-        //
+        $mensaje = Message::destroy(explode(",",$idArray));
+
+        if( $mensaje ) {
+            return response()->json([
+                'success' => true,
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+            ], 404);
+        }
+        
     }
 }

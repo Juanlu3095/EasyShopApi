@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\NewsletterResource;
 use App\Models\Newsletter;
 use Illuminate\Http\Request;
+use App\Exports\NewslettersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class NewsletterController extends Controller
 {
@@ -87,5 +89,13 @@ class NewsletterController extends Controller
                 'success' => false,
             ], 404);
         }
+    }
+
+    /**
+     * Exports newsletters in xls format for Excel.
+     */
+    public function export()
+    {
+        return Excel::download(new NewslettersExport, 'newsletters.xlsx');
     }
 }

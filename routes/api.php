@@ -39,3 +39,4 @@ Route::get('/cvs/empleo/{idEmpleo}', [CvController::class, 'indexByJob'])->name(
 Route::resource('/messages', MessageController::class);
 
 Route::resource('/newsletters', NewsletterController::class);
+Route::get('exportarnews', [NewsletterController::class, 'export'])->name('exportnews');

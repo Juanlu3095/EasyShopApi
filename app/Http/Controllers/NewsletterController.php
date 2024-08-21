@@ -31,7 +31,12 @@ class NewsletterController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $newsletter = Newsletter::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'data' => new NewsletterResource($newsletter)
+        ], 201);
     }
 
     /**
@@ -39,7 +44,8 @@ class NewsletterController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $newsletter = Newsletter::find($id);
+        return new NewsletterResource($newsletter);
     }
 
     /**
@@ -55,14 +61,31 @@ class NewsletterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $newsletter = Newsletter::find($id);
+        $newsletter->update($request->all()); // Asegurarnos de que $fillable esté bien definido en el modelo
+        $newsletter->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => new NewsletterResource($newsletter)
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $idArray)
     {
-        //
+        $newsletter = Newsletter::destroy(explode(",",$idArray));
+
+        if( $newsletter ) {
+            return response()->json([
+                'success' => true,
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+            ], 404);
+        }
     }
 }

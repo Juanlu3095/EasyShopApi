@@ -7,6 +7,7 @@ use App\Http\Resources\CvResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Cv;
+use Illuminate\Support\Facades\Storage;
 
 class CvController extends Controller
 {
@@ -20,7 +21,7 @@ class CvController extends Controller
     }
 
     /**
-     * Display a listing of CVs based on specific Job.
+     * Display a listing of CVs based on specific Job id.
      */
     public function indexByJob(int $idJob)
     {
@@ -41,10 +42,38 @@ class CvController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $cv = Cv::create($request->all());
+        //$cv = Cv::create($request->all());
+
+        $cv = new Cv;
+        $cv->nombre = $request->nombre;
+        $cv->apellidos = $request->apellidos;
+        $cv->email = $request->email;
+        $cv->telefono = $request->telefono;
+        $cv->pais = $request->pais;
+        $cv->ciudad = $request->ciudad;
+        $cv->incorporacion = $request->incorporacion;
+        $cv->job_id = $request->job_id;
+        $cv->estado_candidatura = $request->estado_candidatura;
+        $cv->politica = 1;
+        
+        // Manejo del archivo
+        if ($request->hasFile('ruta_cv')) {
+        $file = $request->file('ruta_cv');
+        $filename = "cv_job" . $cv->job_id . '_' . time() . "." . $file->guessExtension();
+        $path = $file->storeAs('public/cv', $filename); // Guardar archivo en storage/app/public/pdf
+        //$rutaReal = 'storage/cv/' . $filename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
+        $rutaReal = Storage::url('cv/' . $filename); // Otra forma de guardar la ruta del archivo, más recomendable porque si se cambia el disco, las modificaciones son más simples.
+        $cv->ruta_cv = $rutaReal; // Guardamos ruta relativa en ruta_cv en la base de datos
+
+        } else {
+            return response()->json(['error' => 'No se proporcionó un archivo PDF válido.'], 400);
+        }
+        
+        $cv->save();
+        
         return response()->json([
             'success' => true,
-            'data' => $cv
+            'data' => $request
         ], 201);
     }
 
@@ -53,7 +82,11 @@ class CvController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $cv = Cv::find($id);
+        return response()->json([
+            'success' => true,
+            'data' => new CvResource($cv)
+        ]);
     }
 
     /**
@@ -69,14 +102,31 @@ class CvController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $cv = Cv::find($id);
+        $cv->update($request->all());
+        $cv->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => new CvResource($cv)
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $idArray)
     {
-        //
+        $cv = Cv::destroy(explode(",",$idArray));
+
+        if( $cv ) {
+            return response()->json([
+                'success' => true,
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+            ], 404);
+        }
     }
 }

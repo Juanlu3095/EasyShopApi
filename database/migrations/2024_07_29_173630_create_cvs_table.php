@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('apellidos');
             $table->integer('telefono');
             $table->string('email');
-            $table->string('ruta_cv');
+            $table->string('ruta_cv')->unique();
             $table->string('incorporacion');
             $table->string('pais');
             $table->string('ciudad');

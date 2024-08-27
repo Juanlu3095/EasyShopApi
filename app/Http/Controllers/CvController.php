@@ -61,8 +61,8 @@ class CvController extends Controller
         $file = $request->file('ruta_cv');
         $filename = "cv_job" . $cv->job_id . '_' . time() . "." . $file->guessExtension();
         $path = $file->storeAs('public/cv', $filename); // Guardar archivo en storage/app/public/pdf
-        //$rutaReal = 'storage/cv/' . $filename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
-        $rutaReal = Storage::url('cv/' . $filename); // Otra forma de guardar la ruta del archivo, más recomendable porque si se cambia el disco, las modificaciones son más simples.
+        $rutaReal = 'cv/' . $filename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
+        //$rutaReal = Storage::url('cv/' . $filename); // Otra forma de guardar la ruta del archivo, más recomendable porque si se cambia el disco, las modificaciones son más simples.
         $cv->ruta_cv = $rutaReal; // Guardamos ruta relativa en ruta_cv en la base de datos
 
         } else {
@@ -117,15 +117,27 @@ class CvController extends Controller
      */
     public function destroy(string $idArray)
     {
-        $cv = Cv::destroy(explode(",",$idArray));
+        $cv = Cv::find(explode(",",$idArray));
 
         if( $cv ) {
+            
+            foreach ($cv as $row) {
+                if(Storage::disk('public')->exists($row->ruta_cv)) {
+                    Storage::disk('public')->delete($row->ruta_cv); // Si existe el archivo del cv, lo eliminará. Debemos pasar la ruta a delete().  
+                } 
+                Cv::destroy(explode(",",$idArray)); // Elimina las candidaturas seleccionadas para el empleo concreto
+            }
+ 
             return response()->json([
                 'success' => true,
+                'data' => $cv
             ], 200);
+
         } else {
+
             return response()->json([
                 'success' => false,
+                'data' => 'La candidatura no existe.'
             ], 404);
         }
     }

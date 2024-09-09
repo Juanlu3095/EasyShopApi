@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CvRequest;
 use App\Http\Resources\CvResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -40,7 +41,7 @@ class CvController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(CvRequest $request): JsonResponse
     {
         $cv = new Cv;
         $cv->nombre = $request->nombre;

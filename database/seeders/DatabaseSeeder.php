@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Productcategory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -25,8 +27,10 @@ class DatabaseSeeder extends Seeder
             ProvinceSeeder::class,
             JobcategorySeeder::class,
             JobSeeder::class, 
-            MessageSeeder::class, */
-            NewsletterSeeder::class
+            MessageSeeder::class,
+            NewsletterSeeder::class, */
+            ProductcategorySeeder::class,
+            BrandSeeder::class
         ]);
     }
 }

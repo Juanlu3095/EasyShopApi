@@ -1,14 +1,17 @@
 <?php
 
-
+use App\Http\Controllers\BrandController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\JobcategoryController;
 use App\Http\Controllers\CvController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\ProductcategoryController;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,3 +43,8 @@ Route::resource('/messages', MessageController::class);
 
 Route::resource('/newsletters', NewsletterController::class);
 Route::get('exportarnews', [NewsletterController::class, 'export'])->name('exportnews');
+
+Route::resource('/productcategories', ProductcategoryController::class);
+Route::resource('/brand', BrandController::class);
+Route::resource('/product', ProductController::class);
+Route::resource('/image', ImageController::class);

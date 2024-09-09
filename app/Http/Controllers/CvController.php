@@ -42,8 +42,6 @@ class CvController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        //$cv = Cv::create($request->all());
-
         $cv = new Cv;
         $cv->nombre = $request->nombre;
         $cv->apellidos = $request->apellidos;
@@ -60,7 +58,7 @@ class CvController extends Controller
         if ($request->hasFile('ruta_cv')) {
         $file = $request->file('ruta_cv');
         $filename = "cv_job" . $cv->job_id . '_' . time() . "." . $file->guessExtension();
-        $path = $file->storeAs('public/cv', $filename); // Guardar archivo en storage/app/public/pdf
+        $path = $file->storeAs('public/cv', $filename); // Guardar archivo en storage
         $rutaReal = 'cv/' . $filename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
         //$rutaReal = Storage::url('cv/' . $filename); // Otra forma de guardar la ruta del archivo, más recomendable porque si se cambia el disco, las modificaciones son más simples.
         $cv->ruta_cv = $rutaReal; // Guardamos ruta relativa en ruta_cv en la base de datos

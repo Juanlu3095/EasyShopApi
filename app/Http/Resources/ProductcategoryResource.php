@@ -17,8 +17,10 @@ class ProductcategoryResource extends JsonResource
         return [
             'Id' => $this->id,
             'Nombre' => $this->nombre,
+            'Slug' => $this->slug,
             'Imagen' => $this->images->map(function($image) { // Al ser una relación 1:Muchos debemos recorrer las images
                 return [
+                    'Id' => $image->id,
                     'Nombre_imagen' => $image->nombre,
                     'Alt' => $image->alt,
                     'Descripcion' => $image->descripcion,

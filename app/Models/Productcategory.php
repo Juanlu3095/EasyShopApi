@@ -11,7 +11,7 @@ class Productcategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'slug'];
 
     // Relación polimórfica de post de 1:Muchos con image.
     public function images(): MorphMany {

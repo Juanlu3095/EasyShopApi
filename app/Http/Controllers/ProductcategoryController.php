@@ -32,20 +32,42 @@ class ProductcategoryController extends Controller
     public function store(Request $request)
     {
         $productcategory = Productcategory::create([
-            'nombre' => $request->nombre
+            'nombre' => $request->nombre,
+            'slug' => $request->slug
         ]);
 
-        $productcategory->images()->create([
+        // PARA CREAR CVATEGORÍA CON IMAGEN NUEVA
+        /* $productcategory->images()->create([
             'nombre' => $request->nombre . '_category',
             'alt' => $request->alt,
             'descripcion' => $request->descripcion,
             'leyenda' => $request->leyenda,
             'ruta_archivo' => $request->ruta_archivo
-        ]);
+        ]); */
+
+        // PARA CREAR CVATEGORÍA CON IMAGEN EXISTENTE
+        $productcategoryId = $productcategory->id; // Obtenemos la id de la categoría creada
+        $imageId = $request->imagen_id; // Contiene la id de la imagen a asignar para la categoría
+        $imageEditar = Image::find($imageId); // El resultado de buscar la id del formulario del front en la base de datos
+
+        if($imageEditar) {
+            
+            if($imageEditar && !$imageEditar->imageable_id) { // Nos aseguramos que la imagen no esté asignada a otro elemento
+                $imageEditar->update([
+                    'imageable_id' => $productcategoryId,
+                    'imageable_type' => Productcategory::class,
+                ]);
+            } else {
+                return response()->json([
+                    'result' => 'La imagen ya está asignada a otro elemento.',
+                    'data' => $imageId
+                ], 403);
+            }
+        }
 
         return response()->json([
             'result' => 'Categoría de producto creada.',
-            'data' => $productcategory
+            'data' => $imageEditar
         ], 201);
     }
 
@@ -75,7 +97,8 @@ class ProductcategoryController extends Controller
         
         if($productcategory) {
             $productcategory->update([
-                'nombre' => $request->nombre
+                'nombre' => $request->nombre,
+                'slug' => $request->slug
             ]);
 
             // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar
@@ -85,34 +108,32 @@ class ProductcategoryController extends Controller
             ]);
 
             // Vinculamos la nueva imagen seleccionada si ya estaba en la base de datos
-            $nuevaImagen = Image::find($request->nueva_imagen_id); // Si se usase $productcategory->images()->update([...]), se actualizarán todas las images
-                                                                   // vinculadas
-            if($nuevaImagen) { // REVISAR ESTO
-                $nuevaImagen->update([
-                    'imageable_id' => $productcategory->id,
-                    'imageable_type' => Productcategory::class, // se añade App\Models\Productcategory
-                    'nombre' => $request->nombre_imagen ?? $nuevaImagen->nombre, // Si $request->nombre_imagen no es null se aplica éste. En caso contrario, $nuevaImagen->nombre. Si había datos nulos de la imagen, los corregimos con $nuevaImagen.
-                    'alt' => $request->alt ?? $nuevaImagen->alt,
-                    'descripcion' => $request->descripcion ?? $nuevaImagen->descripcion,
-                    'leyenda' => $request->leyenda ?? $nuevaImagen->leyenda,
-                    'ruta_archivo' => $request->ruta_archivo ?? $nuevaImagen->ruta_archivo,
-                ]);
+            $nuevaImagen = Image::find($request->imagen_id); // Si se usase $productcategory->images()->update([...]), se actualizarán todas las images vinculadas
 
-            } else { // Creamos una nueva imagen si no se encontrase ninguna en la base de datos
+            if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
 
-                $productcategory->images()->create([
-                    'nombre' => $request->nombre . '_category',
-                    'alt' => $request->alt,
-                    'descripcion' => $request->descripcion,
-                    'leyenda' => $request->leyenda,
-                    'ruta_archivo' => $request->ruta_archivo
-                ]);
+                if($nuevaImagen && !$nuevaImagen->imageable_id) {
+                    $nuevaImagen->update([
+                        'imageable_id' => $productcategory->id,
+                        'imageable_type' => Productcategory::class, // se añade App\Models\Productcategory
+                    ]);
+
+                    return response()->json([
+                        'result' => 'Categoría de producto modificada.',
+                        'data' => $productcategory
+                    ], 200);
+
+                } else {
+                    return response()->json([
+                        'result' => 'La imagen ya está asignada a otro elemento.',    
+                    ], 403);
+                }
+                
+            } else {
+                return response()->json([
+                    'result' => 'Imagen no encontrada.'
+                ], 404);
             }
-
-            return response()->json([
-                'result' => 'Categoría de producto modificada.',
-                'data' => $productcategory
-            ], 200);
 
         } else {
             return response()->json([
@@ -129,22 +150,31 @@ class ProductcategoryController extends Controller
     {
         $productcategory = Productcategory::find($id);
 
-        // Desvinculamos la imagen actual de la categoría
-        $productcategory->images()->update([
-            'imageable_id' => null,
-            'imageable_type' => null
-        ]);
+        if($productcategory) {
+            // Desvinculamos la imagen actual de la categoría, no se borra la imagen asignada de la base de datos
+            $productcategory->images()->update([
+                'imageable_id' => null,
+                'imageable_type' => null
+            ]);
 
-        // Desvinculamos la categoría de los productos con esa categoría
-        $productcategory->products()->update([
-            'productcategory_id' => null 
-        ]);
+            // Desvinculamos la categoría de los productos con esa categoría
+            $productcategory->products()->update([
+                'productcategory_id' => null 
+            ]);
 
-        $productcategory->delete(); // Eliminamos la categoría
+            $productcategory->delete(); // Eliminamos la categoría
 
-        return response()->json([
-            'result' => 'Categoría de producto eliminada.',
-            'data' => $productcategory
-        ], 200);
+            return response()->json([
+                'result' => 'Categoría de producto eliminada.',
+                'data' => $productcategory
+            ], 200);
+
+        } else {
+            return response()->json([
+                'result' => 'Categoría de producto no encontrada.',
+            ], 404);
+
+        }
+        
     }
 }

@@ -33,8 +33,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('getProvinces'); // La direccion sería api/provinces
 Route::resource('/jobcategories', JobcategoryController::class);
 
+Route::post('/jobs/filter', [JobController::class, 'filter'])->name('filterJobs'); // Permite filtrar jobs, es post porque se envia una request
 Route::resource('/jobs', JobController::class);
 Route::delete('/jobs/selected/{id}', [JobController::class, 'destroySelected'])->name('destroySelectedJobs'); // Permite borrar jobs seleccionados
+
 
 Route::resource('/cvs', CvController::class);
 Route::get('/cvs/empleo/{idEmpleo}', [CvController::class, 'indexByJob'])->name('showCVsbyJob'); // Obtiene los CVs inscritos a una oferta de empleo específica

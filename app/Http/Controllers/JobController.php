@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\JobResource;
 use Illuminate\Http\Request;
 use App\Models\Job;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class JobController extends Controller
 {
@@ -103,5 +105,44 @@ class JobController extends Controller
         return response()->json([
             'success' => true
         ], 200);
+    }
+
+    /**
+     * It lets to filter jobs by province, category and job position
+     */
+    public function filter(Request $request)
+    {
+        $filtroProvincia = $request->provincia;
+        $filtroCategoria = $request->categoria;
+        $filtroPuesto = $request->puesto;
+
+        // Conditional Clauses con Eloquent (si se usa DB:table() con Builder, no se pueden acceder a los métodos de las clases como los resources o las 
+        // relaciones de las tablas, ya que las filas devueltas son instancias de stdClass)
+        // Se usa la clase Job y se prescinde de Builder, que habíamos usado con DB::table()
+        $jobs = Job::when($filtroProvincia, function ($query, int $filtroProvincia) {
+                    $query->where('province_id', $filtroProvincia);
+                    })
+                    ->when($filtroCategoria, function ($query, int $filtroCategoria) {
+                        $query->where('jobcategory_id', $filtroCategoria);
+                    })
+                    ->when($filtroPuesto, function ($query, string $filtroPuesto) {
+                        $query->where('puesto', 'like', '%' . $filtroPuesto . '%');
+                    })
+                    ->get();
+
+        if($jobs) {
+            return response()->json([
+                'success' => true,
+                'result' => JobResource::collection($jobs)
+            ], 200);
+
+        } else {
+            return response()->json([
+                'success' => true,
+                'result' => 'No hay empleos para mostrar'
+            ], 404); 
+        }
+
+        
     }
 }

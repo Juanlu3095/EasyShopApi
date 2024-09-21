@@ -36,7 +36,7 @@ class ProductcategoryController extends Controller
             'slug' => $request->slug
         ]);
 
-        // PARA CREAR CVATEGORÍA CON IMAGEN NUEVA
+        // PARA CREAR CATEGORÍA CON IMAGEN NUEVA
         /* $productcategory->images()->create([
             'nombre' => $request->nombre . '_category',
             'alt' => $request->alt,
@@ -45,7 +45,7 @@ class ProductcategoryController extends Controller
             'ruta_archivo' => $request->ruta_archivo
         ]); */
 
-        // PARA CREAR CVATEGORÍA CON IMAGEN EXISTENTE
+        // PARA CREAR CATEGORÍA CON IMAGEN EXISTENTE
         $productcategoryId = $productcategory->id; // Obtenemos la id de la categoría creada
         $imageId = $request->imagen_id; // Contiene la id de la imagen a asignar para la categoría
         $imageEditar = Image::find($imageId); // El resultado de buscar la id del formulario del front en la base de datos
@@ -63,7 +63,8 @@ class ProductcategoryController extends Controller
                     'data' => $imageId
                 ], 403);
             }
-        }
+        } // Lo malo de esto es que primero se debe crear la categoría para coger la id y asignarlo a la imagen, por lo que si la imagen no puede asignarse,
+          // de todas formas se crea la categoría.
 
         return response()->json([
             'result' => 'Categoría de producto creada.',
@@ -101,18 +102,19 @@ class ProductcategoryController extends Controller
                 'slug' => $request->slug
             ]);
 
-            // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar
-            $productcategory->images()->update([
-                'imageable_id' => null,
-                'imageable_type' => null
-            ]);
-
             // Vinculamos la nueva imagen seleccionada si ya estaba en la base de datos
             $nuevaImagen = Image::find($request->imagen_id); // Si se usase $productcategory->images()->update([...]), se actualizarán todas las images vinculadas
 
             if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
 
                 if($nuevaImagen && !$nuevaImagen->imageable_id) {
+
+                    // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar. SÓLO lo hacemos si no hay imagen asignada a la nueva imagen.
+                    $productcategory->images()->update([
+                        'imageable_id' => null,
+                        'imageable_type' => null
+                    ]);
+
                     $nuevaImagen->update([
                         'imageable_id' => $productcategory->id,
                         'imageable_type' => Productcategory::class, // se añade App\Models\Productcategory

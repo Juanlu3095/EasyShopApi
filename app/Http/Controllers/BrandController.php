@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BrandResource;
 use App\Models\Brand;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller
@@ -12,8 +14,8 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $brand = Brand::all();
-        return response()->json($brand);
+        $brands = Brand::all();
+        return response()->json(BrandResource::collection($brands));
     }
 
     /**
@@ -29,9 +31,33 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        Brand::create($request->all());
+        $brand = Brand::create([
+            'nombre' => $request->nombre
+        ]);
+
+        // PARA CREAR CVATEGORÍA CON IMAGEN EXISTENTE
+        $brandId = $brand->id; // Obtenemos la id de la marca creada
+        $imageId = $request->imagen_id; // Contiene la id de la imagen a asignar para la marca
+        $imageEditar = Image::find($imageId); // El resultado de buscar la id del formulario del front en la base de datos
+
+        if($imageEditar) {
+            
+            if($imageEditar && !$imageEditar->imageable_id) { // Nos aseguramos que la imagen no esté asignada a otro elemento
+                $imageEditar->update([
+                    'imageable_id' => $brandId,
+                    'imageable_type' => Brand::class,
+                ]);
+            } else {
+                return response()->json([
+                    'result' => 'La imagen ya está asignada a otro elemento.',
+                    'data' => $imageId
+                ], 403);
+            }
+        }
+
         return response()->json([
             'result' => 'Marca creada.',
+            'data' => $imageEditar
         ], 201);
     }
 
@@ -41,7 +67,7 @@ class BrandController extends Controller
     public function show(string $id)
     {
         $brand = Brand::find($id);
-        return $brand;
+        return new BrandResource(($brand));
     }
 
     /**
@@ -58,26 +84,76 @@ class BrandController extends Controller
     public function update(Request $request, string $id)
     {
         $brand = Brand::find($id);
-        $brand->nombre = $request->nombre;
-        $brand->save();
+        
+        if($brand) {
+            $brand->update([
+                'nombre' => $request->nombre
+            ]);
 
-        return response()->json([
-            'result' => 'Categoría de producto modificada.',
-            'data' => $brand
-        ], 200);
+            // Vinculamos la nueva imagen seleccionada si ya estaba en la base de datos
+            $nuevaImagen = Image::find($request->imagen_id); // Si se usase $brand->images()->update([...]), se actualizarán todas las images vinculadas
+
+            if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
+
+                if($nuevaImagen && !$nuevaImagen->imageable_id) {
+
+                    // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar. SÓLO lo hacemos si no hay imagen asignada a la nueva imagen.
+                    $brand->images()->update([
+                        'imageable_id' => null,
+                        'imageable_type' => null
+                    ]);
+
+                    $nuevaImagen->update([
+                        'imageable_id' => $brand->id,
+                        'imageable_type' => Brand::class, // se añade App\Models\Brand
+                    ]);
+
+                    return response()->json([
+                        'result' => 'Marca modificada.',
+                        'data' => $brand
+                    ], 200);
+
+                } else {
+                    return response()->json([
+                        'result' => 'La imagen ya está asignada a otro elemento.',    
+                    ], 403);
+                }
+                
+            } else {
+                return response()->json([
+                    'result' => 'Imagen no encontrada.'
+                ], 404);
+            }
+
+        } else {
+            return response()->json([
+                'result' => 'Marca no encontrada.'
+            ], 404);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $idArray)
     {
-        $brand = Brand::find($id);
-        $brand->delete();
+        $ids = explode(",",$idArray); // Obtenemos las id del Array
+        $marcas = Brand::find($ids); // Buscamos las marcas en la base de datos con las id
+        $marcas->map(function($marca) { // Mapeamos las marcas obtenidas de la BD para quitar todas las imágenes asignadas a cada id
+            $marca->images()->update([ // Para cada marca desvinculamos las imágenes asignadas antes de eliminar las marcas
+                'imageable_id' => null,
+                'imageable_type' => null
+            ]);
+
+            $marca->products()->update([ // Para cada marca desvinculamos los productos asignados antes de eliminar las marcas
+                'brand_id' => null
+            ]);
+
+            $marca->delete(); // Eliminamos la marca
+        });
 
         return response()->json([
-            'result' => 'Marca eliminada.',
-            'data' => $brand
-        ], 200);
+            'data' => $marcas
+        ], 200); 
     }
 }

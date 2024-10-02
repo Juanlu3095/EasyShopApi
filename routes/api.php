@@ -12,6 +12,9 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProductcategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AuthController;
+use App\Models\User;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +26,25 @@ use App\Http\Controllers\ProductController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// Gestión de Auth
+Route::post('/userlogin', [AuthController::class, 'loginUser']); // Ruta para iniciar sesión para usuario
+Route::post('/adminlogin', [AuthController::class, 'loginAdmin']); // Ruta para iniciar sesión para administrador
+Route::post('/registro', [AuthController::class, 'registroCliente']); // Ruta para crear usuarios con rol de cliente
+Route::middleware('auth:sanctum')->post('/comprobarusuario', [AuthController::class, 'validarTokenA']); // Ruta para comprobar si el usuario está logueado
+Route::middleware('auth:sanctum')->post('/cerrarsesion', [AuthController::class, 'logout']); // Ruta para cerrar sesión y eliminar token. Importante el middleware
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $user = User::find($request->id);
+    $user->email_verified_at = now();
+        $user->save();  // Guardar los cambios
+    return response()->json([
+        'message' => 'Error',
+        'Dato' => $request->hash,
+        'id' => $request->id,
+        'Usuario' => $request->user()
+    ]);
+  })->middleware(['signed'])->name('verification.verify');
 
 // Agrupación de rutas con protección de sanctum
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -41,7 +63,7 @@ Route::delete('/jobs/selected/{id}', [JobController::class, 'destroySelected'])-
 Route::resource('/cvs', CvController::class);
 Route::get('/cvs/empleo/{idEmpleo}', [CvController::class, 'indexByJob'])->name('showCVsbyJob'); // Obtiene los CVs inscritos a una oferta de empleo específica
 
-Route::resource('/messages', MessageController::class);
+Route::middleware('auth:sanctum')->resource('/messages', MessageController::class);
 
 Route::resource('/newsletters', NewsletterController::class);
 Route::get('exportarnews', [NewsletterController::class, 'export'])->name('exportnews');

@@ -14,12 +14,20 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
+        /* User::create([
             'id' => 1, // Ponemos aquí un id porque hay que relacionarlo con la tabla de teléfonos
             'name' => 'Administrador',
             'email' => 'jcooldevelopment@gmail.com',
             'password' => Hash::make('123456789'), // Hash se utiliza para proteger la contraseña
             'role_id' => 1
+        ]); */
+
+        User::create([
+            'id' => 2, // Ponemos aquí un id porque hay que relacionarlo con la tabla de teléfonos
+            'name' => 'Cliente',
+            'email' => 'cliente@gmail.com',
+            'password' => Hash::make('1234'), // Hash se utiliza para proteger la contraseña
+            'role_id' => 3
         ]);
     }
 }

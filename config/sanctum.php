@@ -46,7 +46,7 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => 1440, // Especifica la expiración en 24 horas. No cambia nada en la columna expires_at.
 
     /*
     |--------------------------------------------------------------------------

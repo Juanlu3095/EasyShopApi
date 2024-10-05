@@ -32,8 +32,8 @@ class AuthServiceProvider extends ServiceProvider
                 ->subject('Verifica tu email')
                 ->line('Para finalizar tu registro en EasyShop necesitamos que verifiques tu email presionando el siguiente botón:')
                 ->action('Verifica tu correo electrónico', $url)
-                ->line('Un saludo,')
-                ->line('El equipo de EasyShop');
+                ->line('Saludos,')
+                ->salutation('El equipo de EasyShop');
         });
     }
 }

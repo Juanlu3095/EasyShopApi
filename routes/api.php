@@ -13,8 +13,6 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProductcategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
-use App\Models\User;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,17 +32,7 @@ Route::post('/registro', [AuthController::class, 'registroCliente']); // Ruta pa
 Route::middleware('auth:sanctum')->post('/comprobarusuario', [AuthController::class, 'validarTokenA']); // Ruta para comprobar si el usuario está logueado
 Route::middleware('auth:sanctum')->post('/cerrarsesion', [AuthController::class, 'logout']); // Ruta para cerrar sesión y eliminar token. Importante el middleware
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $user = User::find($request->id);
-    $user->email_verified_at = now();
-        $user->save();  // Guardar los cambios
-    return response()->json([
-        'message' => 'Error',
-        'Dato' => $request->hash,
-        'id' => $request->id,
-        'Usuario' => $request->user()
-    ]);
-  })->middleware(['signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verificarEmail'])->middleware(['signed'])->name('verification.verify'); // El middleware signed es para que no se modifique la url y para comprobar que no haya caducado, para que sea usada por el usuario correcto 
 
 // Agrupación de rutas con protección de sanctum
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

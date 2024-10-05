@@ -1,0 +1,91 @@
+.form-section{
+    margin: 0 auto;
+}
+
+.logo-app{
+    text-align: center;
+    margin: 2rem;
+}
+
+.logo-app img{
+    width: 25%;
+    
+}
+
+.card{
+    margin: 3rem 0 0 0;
+    border: none !important;
+}
+
+.card-body{
+    box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+    padding: 2rem !important;
+}
+
+.card-body h3, .card-body p{
+    text-align: center;
+}
+
+.form-container{
+    padding: 1rem 0;
+}
+
+.btn-submit{
+    padding: 0.25rem 2rem !important;
+    background-color: #3F51B5 !important;
+    color: white !important;
+}
+
+/* Links */
+.links{
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    gap: 2rem;
+    margin: 2rem;
+}
+
+.links a{
+    text-decoration: none;
+    color: black;
+}
+
+.links a:hover{
+    color: #3F51B5;
+}
+
+/* Política de privacidad */
+.politica{
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.politica a{
+    color: #3F51B5;
+}
+
+/* DESKTOP */
+@media only screen and (min-width: 1367px) {
+    .form-section{
+        width: 30%;
+        padding: 5rem 0;
+    }
+}
+
+/* MÓVIL */
+@media only screen and (max-width: 767px) {
+    .form-section{
+        width: 100%;
+        padding: 2rem 1rem;
+    }
+}
+
+/* TABLET */
+@media only screen and (min-width: 768px) and (max-width: 1366px) {
+    .form-section{
+        width: 50%;
+        padding: 3rem 0;
+    }
+}

@@ -148,43 +148,25 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // No funciona correctamente para verificar email
-    public function verify(EmailVerificationRequest $request)
+    // Función para verificar email al pulsar en el botón
+    public function verificarEmail(EmailVerificationRequest $request)
     {
-            // Obtener el ID del usuario desde la solicitud
-        $userId = $request->route('id');
+        $user = User::find($request->id);
+        //$user->email_verified_at = now(); // Marcamos el email como verificado en la base de datos
+        $user->markEmailAsVerified(); // Ota forma de verificar el email
+        $user->save();  // Guardar los cambios
 
-        // Depurar: Verificar si estamos obteniendo correctamente el ID
-        Log::info('User ID from request: ' . $userId);
+        /* return response()->json([
+            'message' => 'Error',
+            'Dato' => $request->hash,
+            'id' => $request->id,
+            'Usuario' => $request->user()
+        ]); */
 
-        // Cargar el usuario usando el ID
-        $user = User::find($userId);
+        // $request->fulfill(); // Esta función también estaría mal porque pide que el usuario esté autenticado.
 
-        // Depurar: Verificar si el usuario fue encontrado
-        if (!$user) {
-            Log::error('User not found with ID: ' . $userId);
-            return response()->json(['message' => 'User not found'], 404);  // Retorna un error si el usuario no es encontrado
-        }
-
-        // Depurar: Verificar si el usuario ya tiene el email verificado
-        if ($user->hasVerifiedEmail()) {
-            Log::info('Email already verified for user ID: ' . $userId);
-            return response()->json(['message' => 'Email already verified'], 200);  // Si el correo ya ha sido verificado
-        }
-
-        // Verificar que el hash en la URL coincida con el hash del correo electrónico del usuario
-        if (!hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
-            Log::error('Hash mismatch for user ID: ' . $userId);
-            return response()->json(['message' => 'Invalid verification link'], 403);  // Si el hash no coincide
-        }
-
-        // Marcar el email como verificado
-        $user->markEmailAsVerified();
-
-        // Depurar: Confirmar que el email ha sido marcado como verificado
-        Log::info('Email successfully verified for user ID: ' . $userId);
-
-        return response()->json(['message' => 'Email verified successfully'], 200);
+        // Redirección al front-end donde nos diga que el usuario se ha verificado.
+        return redirect('http://localhost:4200/emailverificado');
     }
 
     /**

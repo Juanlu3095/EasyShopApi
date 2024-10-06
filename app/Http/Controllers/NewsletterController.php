@@ -8,6 +8,9 @@ use App\Models\Newsletter;
 use Illuminate\Http\Request;
 use App\Exports\NewslettersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\newslettersubscription;
+use App\Mail\clientnewsletter;
 
 class NewsletterController extends Controller
 {
@@ -34,6 +37,18 @@ class NewsletterController extends Controller
     public function store(Request $request)
     {
         $newsletter = Newsletter::create($request->all());
+
+        date_default_timezone_set('Europe/Madrid'); // Con esto ponemos que el timezone sea GMT+2
+        $email = $request->email;
+        $fecha = date('d-m-Y H:i');
+
+        $datos = array(
+            'email' => $email,
+            'fecha' => $fecha
+        );
+
+        Mail::to('jcooldevelopment@gmail.com')->send(new newslettersubscription($datos)); // Enviamos correo al admin para notificarle de la suscripción.
+        Mail::to($email)->send(new clientnewsletter($datos)); // Enviamos correo al admin para notificarle de la suscripción.
 
         return response()->json([
             'success' => true,

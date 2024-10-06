@@ -39,24 +39,38 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Rutas sin protección con sactum
+// Rutas sin protección con sanctum
+
+/* PROVINCIAS */
 Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('getProvinces'); // La direccion sería api/provinces
+
+/* CATEGORÍAS DE EMPLEO*/
 Route::resource('/jobcategories', JobcategoryController::class);
 
+/* EMPLEO */
 Route::post('/jobs/filter', [JobController::class, 'filter'])->name('filterJobs'); // Permite filtrar jobs, es post porque se envia una request
 Route::resource('/jobs', JobController::class);
 Route::delete('/jobs/selected/{id}', [JobController::class, 'destroySelected'])->name('destroySelectedJobs'); // Permite borrar jobs seleccionados
 
-
+/* CVs */
 Route::resource('/cvs', CvController::class);
 Route::get('/cvs/empleo/{idEmpleo}', [CvController::class, 'indexByJob'])->name('showCVsbyJob'); // Obtiene los CVs inscritos a una oferta de empleo específica
 
+/* MENSAJES */
 Route::middleware('auth:sanctum')->resource('/messages', MessageController::class);
 
+/* NEWSLETTERS */
 Route::resource('/newsletters', NewsletterController::class);
 Route::get('exportarnews', [NewsletterController::class, 'export'])->name('exportnews');
 
+/* CATEGORÍAS DE PRODUCTO */
 Route::resource('/productcategories', ProductcategoryController::class);
+
+/* MARCAS DE PRODUCTO */
 Route::resource('/brand', BrandController::class);
+
+/* PRODUCTOS */
 Route::resource('/product', ProductController::class);
+
+/* IMÁGENES */
 Route::resource('/image', ImageController::class);

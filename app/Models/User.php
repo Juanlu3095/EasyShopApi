@@ -48,7 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     ];
 
     // Relación 1:Muchos con User (1 rol pertenece a varios usuarios)
-    public function roles(): BelongsTo{
+    public function role(): BelongsTo{
         return $this->belongsTo(Role::class);
     }
 }

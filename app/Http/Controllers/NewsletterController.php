@@ -38,7 +38,7 @@ class NewsletterController extends Controller
     {
         $newsletter = Newsletter::create($request->all());
 
-        date_default_timezone_set('Europe/Madrid'); // Con esto ponemos que el timezone sea GMT+2
+        //date_default_timezone_set('Europe/Madrid'); // Con esto ponemos que el timezone sea GMT+2
         $email = $request->email;
         $fecha = date('d-m-Y H:i');
 

@@ -13,6 +13,8 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProductcategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +42,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Rutas sin protección con sanctum
+
+/* USUARIOS */
+Route::resource('/usuario', UserController::class);
+
+/* ROLES */
+Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 
 /* PROVINCIAS */
 Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('getProvinces'); // La direccion sería api/provinces

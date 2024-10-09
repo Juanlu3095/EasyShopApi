@@ -68,7 +68,7 @@ class AuthController extends Controller
         $nombre = $user->name; // Obtenemos el nombre de la request
         $email = $user->email; // Obtenemos el email de la request
 
-        date_default_timezone_set('Europe/Madrid'); // Con esto ponemos que el timezone sea GMT+2
+        //date_default_timezone_set('Europe/Madrid'); // Con esto ponemos que el timezone sea GMT+2
         $fecha = date('d-m-Y H:i'); // Obtenemos la fecha con el timezone indicado arriba
         $browser = $request->header('User-Agent'); // Obtenemos los datos del navegador y/o dispositivo que realiza la petición
 
@@ -97,7 +97,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Token validation to permit access or not to a protected page.
+     * Token validation to permit access or not to a protected page. Used to validate user while browsing in admin dashboard.
      */
     public function validarTokenA(Request $request): JsonResponse {
         
@@ -149,7 +149,9 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // Función para verificar email al pulsar en el botón
+    /**
+     * It verifies the user once you click the button inside the email
+     */
     public function verificarEmail(EmailVerificationRequest $request)
     {
         $user = User::find($request->id);

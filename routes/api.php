@@ -36,49 +36,73 @@ Route::middleware('auth:sanctum')->post('/cerrarsesion', [AuthController::class,
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verificarEmail'])->middleware(['signed'])->name('verification.verify'); // El middleware signed es para que no se modifique la url y para comprobar que no haya caducado, para que sea usada por el usuario correcto 
 
-// Agrupación de rutas con protección de sanctum
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Grupo de rutas con middleware SANCTUM, email verificado y rol admin (Para administradores)
+Route::middleware('auth:sanctum', 'admin', 'verified')->group(function () {
+
+    /* USUARIOS */
+    Route::resource('/usuario', UserController::class);
+
+    /* ROLES */
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+
+    /* CATEGORÍAS DE EMPLEO*/
+    Route::resource('/jobcategories', JobcategoryController::class)->except(['index', 'show']);
+
+    /* EMPLEO */
+    Route::resource('/jobs', JobController::class)->except(['index', 'show']);
+    Route::delete('/jobs/selected/{id}', [JobController::class, 'destroySelected'])->name('destroySelectedJobs'); // Permite borrar jobs seleccionados
+
+    /* CVs */
+    Route::resource('/cvs', CvController::class)->except(['store']);
+    Route::get('/cvs/empleo/{idEmpleo}', [CvController::class, 'indexByJob'])->name('showCVsbyJob'); // Obtiene los CVs inscritos a una oferta de empleo específica
+
+    /* MENSAJES */
+    Route::resource('/messages', MessageController::class)->except(['store']);
+
+    /* NEWSLETTERS */
+    Route::resource('/newsletters', NewsletterController::class)->except(['store']);
+    Route::get('exportarnews', [NewsletterController::class, 'export'])->name('exportnews');
+
+    /* IMÁGENES */
+    Route::resource('/image', ImageController::class);
 });
 
-// Rutas sin protección con sanctum
+// Grupo de rutas con middleware Sanctum y email verificado (Para clientes)
+Route::middleware('auth:sanctum', 'verified')->group(function () {
 
-/* USUARIOS */
-Route::resource('/usuario', UserController::class);
+    /* USUARIOS */
+    Route::get('/dataclient', [AuthController::class, 'dataclient'])->name('client.data');
+});
 
-/* ROLES */
-Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+// Rutas sin protección con sanctum (Para usuarios que no necesitan estar logueados)
 
-/* PROVINCIAS */
-Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('getProvinces'); // La direccion sería api/provinces
+    /* PROVINCIAS */
+    Route::get('/provinces', [ProvinceController::class, 'getProvinces'])->name('getProvinces'); // La direccion sería api/provinces
 
-/* CATEGORÍAS DE EMPLEO*/
-Route::resource('/jobcategories', JobcategoryController::class);
+    /* CATEGORÍAS DE EMPLEO*/
+    Route::resource('/jobcategories', JobcategoryController::class)->only(['index', 'show']);
 
-/* EMPLEO */
-Route::post('/jobs/filter', [JobController::class, 'filter'])->name('filterJobs'); // Permite filtrar jobs, es post porque se envia una request
-Route::resource('/jobs', JobController::class);
-Route::delete('/jobs/selected/{id}', [JobController::class, 'destroySelected'])->name('destroySelectedJobs'); // Permite borrar jobs seleccionados
+    /* EMPLEO */
+    Route::post('/jobs/filter', [JobController::class, 'filter'])->name('filterJobs'); // Permite filtrar jobs, es post porque se envia una request
+    Route::resource('/jobs', JobController::class)->only(['index', 'show']);
 
-/* CVs */
-Route::resource('/cvs', CvController::class);
-Route::get('/cvs/empleo/{idEmpleo}', [CvController::class, 'indexByJob'])->name('showCVsbyJob'); // Obtiene los CVs inscritos a una oferta de empleo específica
+    /* CVs */
+    Route::resource('/cvs', CvController::class)->only(['store']);
 
-/* MENSAJES */
-Route::middleware('auth:sanctum')->resource('/messages', MessageController::class);
+    /* MENSAJES */
+    Route::resource('/messages', MessageController::class)->only(['store']);
 
-/* NEWSLETTERS */
-Route::resource('/newsletters', NewsletterController::class);
-Route::get('exportarnews', [NewsletterController::class, 'export'])->name('exportnews');
+    /* NEWSLETTERS */
+    Route::resource('/newsletters', NewsletterController::class)->only(['store']);
 
-/* CATEGORÍAS DE PRODUCTO */
-Route::resource('/productcategories', ProductcategoryController::class);
+    /* CATEGORÍAS DE PRODUCTO */
+    Route::resource('/productcategories', ProductcategoryController::class);
 
-/* MARCAS DE PRODUCTO */
-Route::resource('/brand', BrandController::class);
+    /* MARCAS DE PRODUCTO */
+    Route::resource('/brand', BrandController::class);
 
-/* PRODUCTOS */
-Route::resource('/product', ProductController::class);
+    /* PRODUCTOS */
+    Route::resource('/product', ProductController::class);
 
-/* IMÁGENES */
-Route::resource('/image', ImageController::class);
+    /* IMÁGENES */
+    //Route::resource('/image', ImageController::class); // En principio esta clase se maneja desde el panel de admin sólo, habrá que verlo cuando se empiece con los productos.

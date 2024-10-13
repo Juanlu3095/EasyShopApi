@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistroRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -95,6 +96,27 @@ class AuthController extends Controller
             'token' => $user->createToken("API TOKEN", ['*'], now()->addDay())->plainTextToken, // Creamos token con expiración de un día
         ], 200);
     }
+
+    /**
+     * Get data from client while logged using authorization token
+     */
+    public function dataclient() {
+        $user = auth()->user();
+
+        if($user && $user->role_id === 3) {
+            return response()->json([
+                'status' => true,
+                'data' => new UserResource($user)
+            ], 200);
+
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'No se ha podido obtener los datos.'
+            ], 401);
+        }
+    }
+
 
     /**
      * Token validation to permit access or not to a protected page. Used to validate user while browsing in admin dashboard.

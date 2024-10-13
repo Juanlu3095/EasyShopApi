@@ -20,7 +20,6 @@ class JobController extends Controller
         $jobs = Job::orderBy('id', 'desc')->get();
 
         return response()->json(JobResource::collection($jobs), 200);
-        
     }
 
     /**
@@ -120,13 +119,13 @@ class JobController extends Controller
         // relaciones de las tablas, ya que las filas devueltas son instancias de stdClass)
         // Se usa la clase Job y se prescinde de Builder, que habíamos usado con DB::table()
         $jobs = Job::when($filtroProvincia, function ($query, int $filtroProvincia) {
-                    $query->where('province_id', $filtroProvincia);
+                    $query->where('province_id', $filtroProvincia)->orderBy('id', 'desc');
                     })
                     ->when($filtroCategoria, function ($query, int $filtroCategoria) {
-                        $query->where('jobcategory_id', $filtroCategoria);
+                        $query->where('jobcategory_id', $filtroCategoria)->orderBy('id', 'desc');
                     })
                     ->when($filtroPuesto, function ($query, string $filtroPuesto) {
-                        $query->where('puesto', 'like', '%' . $filtroPuesto . '%');
+                        $query->where('puesto', 'like', '%' . $filtroPuesto . '%')->orderBy('id', 'desc');
                     })
                     ->get();
 
@@ -142,7 +141,6 @@ class JobController extends Controller
                 'result' => 'No hay empleos para mostrar'
             ], 404); 
         }
-
-        
+       
     }
 }

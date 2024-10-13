@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CvRequest;
 use App\Http\Resources\CvResource;
+use App\Mail\jobapplication;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Cv;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class CvController extends Controller
 {
@@ -63,6 +65,16 @@ class CvController extends Controller
         $rutaReal = 'cv/' . $filename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
         //$rutaReal = Storage::url('cv/' . $filename); // Otra forma de guardar la ruta del archivo, más recomendable porque si se cambia el disco, las modificaciones son más simples.
         $cv->ruta_cv = $rutaReal; // Guardamos ruta relativa en ruta_cv en la base de datos
+
+        // Envío de email de confirmación al candidato
+        $job = $cv->job->puesto; // relación 1:Muchos entre cv y job, 1 job muchos cvs
+
+        $datos = Array(
+            'nombre' => $cv->nombre,
+            'job' => $job
+        );
+
+        Mail::to($cv->email)->send(new jobapplication($datos));
 
         } else {
             return response()->json(['error' => 'No se proporcionó un archivo PDF válido.'], 400);

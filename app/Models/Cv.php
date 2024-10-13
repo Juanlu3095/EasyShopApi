@@ -15,7 +15,7 @@ class Cv extends Model
     ];
 
     // Relación 1:Muchos con Job (1 Oferta de empleo tiene varios CVs)
-    public function jobs(): BelongsTo{
+    public function job(): BelongsTo{
         return $this->belongsTo(Job::class);
     }
 }

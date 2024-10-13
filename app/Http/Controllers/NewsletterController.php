@@ -48,7 +48,7 @@ class NewsletterController extends Controller
         );
 
         Mail::to('jcooldevelopment@gmail.com')->send(new newslettersubscription($datos)); // Enviamos correo al admin para notificarle de la suscripción.
-        Mail::to($email)->send(new clientnewsletter($datos)); // Enviamos correo al admin para notificarle de la suscripción.
+        Mail::to($email)->send(new clientnewsletter($datos)); // Enviamos correo al cliente para notificarle de la suscripción.
 
         return response()->json([
             'success' => true,

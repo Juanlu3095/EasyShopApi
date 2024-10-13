@@ -5,25 +5,25 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Address;
 
-class newslettersubscription extends Mailable
+class jobapplication extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $email;
-    public $fecha;
+    public $nombre;
+    public $job;
 
     /**
      * Create a new message instance.
      */
     public function __construct($datos)
     {
-        $this->email = $datos['email'];
-        $this->fecha = $datos['fecha'];
+        $this->nombre = $datos['nombre'];
+        $this->job = $datos['job'];
     }
 
     /**
@@ -33,7 +33,7 @@ class newslettersubscription extends Mailable
     {
         return new Envelope(
             from: new Address('easyshop.notifications@gmail.com', 'EasyShop Notifications'),
-            subject: 'Nueva suscripción a la newsletter de EasyShop',
+            subject: "Tu aplicación a la oferta de empleo {$this->job}",
         );
     }
 
@@ -43,7 +43,7 @@ class newslettersubscription extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.newslettersubscription',
+            view: 'mails.jobapplication',
         );
     }
 

@@ -18,7 +18,7 @@ class Productcategory extends Model
         return $this->morphMany(Image::class, 'imageable'); // Debemos indicar 'imageable' porque el nombre de la función 'images' no respeta la convención
     }
 
-    // 1 categoría de producto pertenece a varios productos
+    // 1 categoría de producto tiene varios productos
     public function products(): HasMany {
         return $this->hasMany(Product::class);
     }

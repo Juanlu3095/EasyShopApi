@@ -15,7 +15,7 @@ class ImageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $arrayData = [
             'Id' => $this->id,
             'Nombre' => $this->nombre,
             'Alt' => $this->alt,
@@ -28,5 +28,14 @@ class ImageResource extends JsonResource
             'Tipo' => getimagesize(Storage::path('public/' . $this->ruta_archivo))['mime'],
             'Nombre_archivo' => basename(Storage::path('public/' . $this->ruta_archivo))
         ];
+
+        // Si la imagen está en uso se indica en la propiedad Estado
+        if($this->imageable_id) {
+            $arrayData['Estado'] = 'Asignada';
+        } else {
+            $arrayData['Estado'] = 'No asignada';
+        }
+
+        return $arrayData;
     }
 }

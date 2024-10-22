@@ -35,7 +35,7 @@ class BrandController extends Controller
             'nombre' => $request->nombre
         ]);
 
-        // PARA CREAR CVATEGORÍA CON IMAGEN EXISTENTE
+        // PARA CREAR CATEGORÍA CON IMAGEN EXISTENTE
         $brandId = $brand->id; // Obtenemos la id de la marca creada
         $imageId = $request->imagen_id; // Contiene la id de la imagen a asignar para la marca
         $imageEditar = Image::find($imageId); // El resultado de buscar la id del formulario del front en la base de datos
@@ -95,14 +95,17 @@ class BrandController extends Controller
 
             if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
 
-                if($nuevaImagen && !$nuevaImagen->imageable_id) {
+                if(!$nuevaImagen->imageable_id || $nuevaImagen->imageable_id == $id) {
 
                     // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar. SÓLO lo hacemos si no hay imagen asignada a la nueva imagen.
-                    $brand->images()->update([
-                        'imageable_id' => null,
-                        'imageable_type' => null
-                    ]);
-
+                    // Ésto sólo lo hacemos en caso de que la id de la categoria no coincida con imageable_id de la imagen, para que no se pierda la imagen asignada
+                    if($nuevaImagen->imageable_id != $id) {
+                        $brand->images()->update([
+                            'imageable_id' => null,
+                            'imageable_type' => null
+                        ]);
+                    }
+                    
                     $nuevaImagen->update([
                         'imageable_id' => $brand->id,
                         'imageable_type' => Brand::class, // se añade App\Models\Brand

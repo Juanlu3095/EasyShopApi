@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductcategoryRequest;
 use App\Http\Resources\ProductcategoryResource;
 use App\Models\Image;
 use App\Models\Productcategory;
@@ -29,7 +30,7 @@ class ProductcategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductcategoryRequest $request)
     {
         $productcategory = Productcategory::create([
             'nombre' => $request->nombre,
@@ -92,7 +93,7 @@ class ProductcategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductcategoryRequest $request, string $id)
     {
         $productcategory = Productcategory::find($id);
         
@@ -107,13 +108,16 @@ class ProductcategoryController extends Controller
 
             if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
 
-                if($nuevaImagen && !$nuevaImagen->imageable_id) {
+                if(!$nuevaImagen->imageable_id || $nuevaImagen->imageable_id == $id) {
 
                     // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar. SÓLO lo hacemos si no hay imagen asignada a la nueva imagen.
-                    $productcategory->images()->update([
-                        'imageable_id' => null,
-                        'imageable_type' => null
-                    ]);
+                    // Ésto sólo lo hacemos en caso de que la id de la categoria no coincida con imageable_id de la imagen, para que no se pierda la imagen asignada
+                    if($nuevaImagen->imageable_id != $id) {
+                        $productcategory->images()->update([
+                            'imageable_id' => null,
+                            'imageable_type' => null
+                        ]);
+                    }
 
                     $nuevaImagen->update([
                         'imageable_id' => $productcategory->id,
@@ -127,7 +131,7 @@ class ProductcategoryController extends Controller
 
                 } else {
                     return response()->json([
-                        'result' => 'La imagen ya está asignada a otro elemento.',    
+                        'result' => 'La imagen ya está asignada a otro elemento.'
                     ], 403);
                 }
                 

@@ -13,6 +13,7 @@ class Brand extends Model
 
     protected $fillable = ['nombre'];
 
+    // 1 MARCA tiene varios PRODUCTOS
     public function products(): HasMany {
         return $this->hasMany(Product::class);
     }

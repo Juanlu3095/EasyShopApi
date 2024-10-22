@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Brand;
+use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Productcategory;
@@ -14,8 +16,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $product = Product::all();
-        return $product;
+        $products = Product::all();
+        return ProductResource::collection($products);
     }
 
     /**
@@ -31,8 +33,8 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $category = Productcategory::find($request->productcategory_id); // Buscamos la categoría
-        $brand = Brand::find($request->brand_id); // Buscamos la marca
+        $category = Productcategory::find($request->categoria_id); // Buscamos la categoría
+        $brand = Brand::find($request->marca_id); // Buscamos la marca
 
         // Verificamos que la categoría exista, y si es así, se crea el producto
         if($category && $brand) {
@@ -40,8 +42,9 @@ class ProductController extends Controller
                 'nombre' => $request->nombre,          // ya asegura la relación entre ambas tablas
                 'descripcion' => $request->descripcion,
                 'descripcion_corta' => $request->descripcion_corta,
-                'brand_id' => $request->brand_id,
-                'estado_producto' => $request->estado_producto,
+                'productcategory_id' => $request->categoria_id,
+                'brand_id' => $request->marca_id,
+                'estado_producto' => $request->estado,
                 'precio' => $request->precio,
                 'precio_rebajado' => $request->precio_rebajado,
                 'sku' => $request->sku,
@@ -49,9 +52,19 @@ class ProductController extends Controller
                 'inventario' => $request->inventario
             ]);
 
+            $productId = $product->id;
+            $imageId = Image::find($request->imagen_id);
+
+            if($imageId) {
+                $imageId->update([
+                    'imageable_id' => $productId,
+                    'imageable_type' => Product::class
+                ]);
+            }
+            
             return response()->json([
                 'result' => 'Producto creado.',
-                'data' => $product
+                'data' => $product->id
             ], 201);
 
         } else {
@@ -70,7 +83,7 @@ class ProductController extends Controller
         $product = Product::find($id);
 
         if($product) {
-            return $product;
+            return new ProductResource($product);
 
         } else {
             return response()->json([
@@ -93,17 +106,19 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $product_id)
     {
-        $category = Productcategory::find($request->productcategory_id); // Buscamos la categoría
-        $brand = Brand::find($request->brand_id); // Buscamos la marca
+        $category = Productcategory::find($request->categoria_id); // Buscamos la categoría
+        $brand = Brand::find($request->marca_id); // Buscamos la marca
+        $product = Product::find($product_id);
 
-        // Verificamos que la categoría existe
-        if($category && $brand) {
-            $product = $category->products()->where('id', $product_id)->update([ // No es necesario añadir la id de la categoría en el update si está en $category
+        if($brand && $category) {
+
+            $product->update([
                 'nombre' => $request->nombre,
                 'descripcion' => $request->descripcion,
                 'descripcion_corta' => $request->descripcion_corta,
-                'brand_id' => $request->brand_id,
-                'estado_producto' => $request->estado_producto,
+                'productcategory_id' => $request->categoria_id,
+                'brand_id' => $request->marca_id,
+                'estado_producto' => $request->estado,
                 'precio' => $request->precio,
                 'precio_rebajado' => $request->precio_rebajado,
                 'sku' => $request->sku,
@@ -111,10 +126,44 @@ class ProductController extends Controller
                 'inventario' => $request->inventario
             ]);
 
-            return response()->json([
-                'result' => 'Producto actualizado.',
-                'data' => $product
-            ], 200);
+            // Vinculamos la nueva imagen seleccionada si ya estaba en la base de datos
+            $nuevaImagen = Image::find($request->imagen_id); // Si se usase $brand->images()->update([...]), se actualizarán todas las images vinculadas
+
+            if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
+
+                if(!$nuevaImagen->imageable_id || $nuevaImagen->imageable_id == $product_id) {
+
+                    // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar. SÓLO lo hacemos si no hay imagen asignada a la nueva imagen.
+                    // Ésto sólo lo hacemos en caso de que la id de la categoria no coincida con imageable_id de la imagen, para que no se pierda la imagen asignada
+                    if($nuevaImagen->imageable_id != $product_id && $nuevaImagen->imageable_type != Product::class) {
+                        $product->images()->update([
+                            'imageable_id' => null,
+                            'imageable_type' => null
+                        ]);
+                    }
+                    
+                    $nuevaImagen->update([
+                        'imageable_id' => $product->id,
+                        'imageable_type' => Product::class, // se añade App\Models\Product
+                    ]);
+
+                    return response()->json([
+                        'result' => 'Marca modificada.',
+                        'data' => $product
+                    ], 200);
+
+                } else {
+                    return response()->json([
+                        'result' => 'La imagen ya está asignada a otro elemento.',    
+                    ], 403);
+                }
+                
+            } else {
+                return response()->json([
+                    'result' => 'Imagen no encontrada.'
+                ], 404);
+            }
+
 
         } else {
             return response()->json([
@@ -127,11 +176,21 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $idArray)
     {
-        $product = Product::find($id);
-        if($product) {
-            $product->delete();
+        $ids = explode(",",$idArray); // Obtenemos las id del Array
+        $products = Product::find($ids); // Buscamos los productos en la base de datos con las id
+
+        if($products) {
+            $products->map(function($product) { // Mapeamos los productos obtenidas de la BD para quitar todas las imágenes asignadas a cada id
+                $product->images()->update([ // Para cada producto desvinculamos las imágenes asignadas antes de eliminar los productos
+                    'imageable_id' => null,
+                    'imageable_type' => null
+                ]);
+    
+                $product->delete(); // Eliminamos el producto
+
+            });
 
             return response()->json([
                 'result' => 'Producto eliminado.'
@@ -139,7 +198,7 @@ class ProductController extends Controller
 
         } else {
             return response()->json([
-                'result' => 'No se ha encontrado el producto.'
+                'result' => 'No se ha podido procesar la petición.'
             ], 404);
         }
         

@@ -21,6 +21,15 @@ class ProductController extends Controller
     }
 
     /**
+     * Display a listing of the last five published products ordered by updated_at.
+     */
+    public function indexNovedades()
+    {
+        $novedades = Product::where('estado_producto', 'publicada')->orderBy('updated_at', 'desc')->limit(5)->get();
+        return ProductResource::collection($novedades);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -131,11 +140,11 @@ class ProductController extends Controller
 
             if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
 
-                if(!$nuevaImagen->imageable_id || $nuevaImagen->imageable_id == $product_id) {
+                if(!$nuevaImagen->imageable_id || $nuevaImagen->imageable_id == $product_id && $nuevaImagen->imageable_type == Product::class) {
 
-                    // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar. SÓLO lo hacemos si no hay imagen asignada a la nueva imagen.
-                    // Ésto sólo lo hacemos en caso de que la id de la categoria no coincida con imageable_id de la imagen, para que no se pierda la imagen asignada
-                    if($nuevaImagen->imageable_id != $product_id && $nuevaImagen->imageable_type != Product::class) {
+                    // Desvinculamos la imagen actual del producto si la hay.
+                    // Ésto sólo lo hacemos en caso de que la id de la categoria no coincida con imageable_id de la imagen, para que no se pierda la imagen asignada, para ello el if
+                    if($nuevaImagen->imageable_id != $product_id) {
                         $product->images()->update([
                             'imageable_id' => null,
                             'imageable_type' => null

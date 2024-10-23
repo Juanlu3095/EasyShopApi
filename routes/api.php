@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Models\Product;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +104,7 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* PRODUCTOS */
     Route::resource('/product', ProductController::class);
+    Route::get('/novedades', [ProductController::class, 'indexNovedades']);
 
     /* IMÁGENES */
     //Route::resource('/image', ImageController::class); // En principio esta clase se maneja desde el panel de admin sólo, habrá que verlo cuando se empiece con los productos.

@@ -95,7 +95,7 @@ class BrandController extends Controller
 
             if($nuevaImagen) { // SI EXISTE LA IMAGEN, ACTUALIZAR LA ID Y EL TYPE
 
-                if(!$nuevaImagen->imageable_id || $nuevaImagen->imageable_id == $id) {
+                if(!$nuevaImagen->imageable_id || $nuevaImagen->imageable_id == $id && $nuevaImagen->imageable_type == Brand::class) {
 
                     // Desvinculamos la imagen actual, no la borramos para que se pueda volver a usar. SÓLO lo hacemos si no hay imagen asignada a la nueva imagen.
                     // Ésto sólo lo hacemos en caso de que la id de la categoria no coincida con imageable_id de la imagen, para que no se pierda la imagen asignada

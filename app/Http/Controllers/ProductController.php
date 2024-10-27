@@ -19,6 +19,15 @@ class ProductController extends Controller
         $products = Product::all();
         return ProductResource::collection($products);
     }
+    
+    /**
+     * Display a listing of published products.
+     */
+    public function indexPublished()
+    {
+        $products = Product::where('estado_producto', 'publicada')->orderBy('updated_at', 'desc')->get();
+        return ProductResource::collection($products);
+    }
 
     /**
      * Display a listing of the last five published products ordered by updated_at.
@@ -27,6 +36,76 @@ class ProductController extends Controller
     {
         $novedades = Product::where('estado_producto', 'publicada')->orderBy('updated_at', 'desc')->limit(5)->get();
         return ProductResource::collection($novedades);
+    }
+
+    /**
+     * Display a listing of products by category.
+     */
+    public function indexPorCategoria(string $slug)
+    {
+        $category = Productcategory::where('slug', $slug)->first();
+        $products = Product::where('productcategory_id', $category->id)->where('estado_producto', 'publicada')->get();
+        return ProductResource::collection($products);
+    }
+
+    /**
+     * Display a listing of products by brand.
+     */
+    public function indexPorMarca(string $id)
+    {
+        $products = Product::where('brand_id', $id)->where('estado_producto', 'publicada')->get();
+        return ProductResource::collection(($products));
+    }
+
+    /**
+     * Display a listing of related products by category, excluding principal product.
+     */
+    public function productosRelacionados(Request $request)
+    {
+        $products = Product::where('productcategory_id', $request->categoria_id)
+        ->where('id', '!=', 1)
+        ->where('estado_producto', 'publicada')
+        ->limit(3)->get();
+        return ProductResource::collection(($products));
+    }
+
+    /**
+     * Display a listing of products using a filter by prize, category and brand.
+     */
+    public function filtrarProductos(Request $request)
+    {
+        $filtroCategoria = $request->categoria;
+        $filtroMarca = $request->marca;
+        $filtroPreciomin = $request->preciomin;
+        $filtroPreciomax = $request->preciomax;
+
+        $products = Product::when($filtroCategoria, function ($query, int $filtroCategoria) {
+            $query->where('productcategory_id', $filtroCategoria)->orderBy('id', 'desc');
+            })
+            ->when($filtroMarca, function ($query, int $filtroMarca) {
+                $query->where('brand_id', $filtroMarca)->orderBy('id', 'desc');
+            })
+            ->when($filtroPreciomin, function ($query, int $filtroPreciomin) {
+                $query->where('precio', '>', $filtroPreciomin)->orderBy('id', 'desc');
+            })
+            ->when($filtroPreciomax, function ($query, int $filtroPreciomax) {
+                $query->where('precio', '<', $filtroPreciomax)->orderBy('id', 'desc');
+            })
+            ->where('estado_producto', 'publicada')
+            ->get();
+        
+            if($products) {
+                return response()->json([
+                    'success' => true,
+                    'result' => ProductResource::collection($products)
+                ], 200);
+    
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'result' => 'No hay productos para mostrar'
+                ], 404); 
+            }
     }
 
     /**
@@ -97,7 +176,7 @@ class ProductController extends Controller
         } else {
             return response()->json([
                 'result' => 'No se ha encontrado el producto.'
-            ]);
+            ], 404);
         }
         
     }

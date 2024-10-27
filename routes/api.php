@@ -104,7 +104,12 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* PRODUCTOS */
     Route::resource('/product', ProductController::class);
+    Route::get('/productospublicados', [ProductController::class, 'indexPublished']);
     Route::get('/novedades', [ProductController::class, 'indexNovedades']);
+    Route::get('/productsByCategory/{slug}', [ProductController::class, 'indexPorCategoria']);
+    Route::get('/productsByBrand/{id}', [ProductController::class, 'indexPorMarca']);
+    Route::post('/relatedProducts', [ProductController::class, 'productosRelacionados']);
+    Route::post('/filtrarProductos', [ProductController::class, 'filtrarProductos']);
 
     /* IMÁGENES */
     //Route::resource('/image', ImageController::class); // En principio esta clase se maneja desde el panel de admin sólo, habrá que verlo cuando se empiece con los productos.

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BusquedaproductoRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Brand;
 use App\Models\Image;
@@ -106,6 +107,31 @@ class ProductController extends Controller
                     'result' => 'No hay productos para mostrar'
                 ], 404); 
             }
+    }
+
+    /**
+     * Display a listing of products using a filter by search.
+     */
+    public function buscarProductos(BusquedaproductoRequest $request)
+    {
+        $busqueda = $request->query('busqueda');
+
+        $products = Product::where('nombre', 'like', '%' . $busqueda . '%')->orderBy('id', 'desc')->get();
+
+        if($products) {
+
+            return response()->json([
+                'success' => true,
+                'result' => ProductResource::collection($products)
+            ], 200);
+
+        } else {
+
+            return response()->json([
+                    'success' => false,
+                    'result' => 'No hay productos para mostrar'
+            ], 404); 
+        }
     }
 
     /**

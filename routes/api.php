@@ -110,6 +110,7 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
     Route::get('/productsByBrand/{id}', [ProductController::class, 'indexPorMarca']);
     Route::post('/relatedProducts', [ProductController::class, 'productosRelacionados']);
     Route::post('/filtrarProductos', [ProductController::class, 'filtrarProductos']);
+    Route::get('/buscarProductos', [ProductController::class, 'buscarProductos']);
 
     /* IMÁGENES */
     //Route::resource('/image', ImageController::class); // En principio esta clase se maneja desde el panel de admin sólo, habrá que verlo cuando se empiece con los productos.

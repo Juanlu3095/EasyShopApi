@@ -66,6 +66,15 @@ Route::middleware('auth:sanctum', 'admin', 'verified')->group(function () {
 
     /* IMÁGENES */
     Route::resource('/image', ImageController::class);
+
+    /* CATEGORÍAS DE PRODUCTO */
+    Route::resource('/productcategories', ProductcategoryController::class)->except(['index'. 'show']);
+
+    /* MARCAS DE PRODUCTO */
+    Route::resource('/brand', BrandController::class)->except(['index', 'show']);
+
+    /* PRODUCTOS */
+    Route::resource('/product', ProductController::class)->except(['index', 'show']);
 });
 
 // Grupo de rutas con middleware Sanctum y email verificado (Para clientes)
@@ -97,13 +106,13 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
     Route::resource('/newsletters', NewsletterController::class)->only(['store']);
 
     /* CATEGORÍAS DE PRODUCTO */
-    Route::resource('/productcategories', ProductcategoryController::class);
+    Route::resource('/productcategories', ProductcategoryController::class)->only(['index', 'show']);
 
     /* MARCAS DE PRODUCTO */
-    Route::resource('/brand', BrandController::class);
+    Route::resource('/brand', BrandController::class)->only(['index', 'show']);
 
     /* PRODUCTOS */
-    Route::resource('/product', ProductController::class);
+    Route::resource('/product', ProductController::class)->only(['index', 'show']);
     Route::get('/productospublicados', [ProductController::class, 'indexPublished']);
     Route::get('/novedades', [ProductController::class, 'indexNovedades']);
     Route::get('/productsByCategory/{slug}', [ProductController::class, 'indexPorCategoria']);
@@ -111,6 +120,3 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
     Route::post('/relatedProducts', [ProductController::class, 'productosRelacionados']);
     Route::post('/filtrarProductos', [ProductController::class, 'filtrarProductos']);
     Route::get('/buscarProductos', [ProductController::class, 'buscarProductos']);
-
-    /* IMÁGENES */
-    //Route::resource('/image', ImageController::class); // En principio esta clase se maneja desde el panel de admin sólo, habrá que verlo cuando se empiece con los productos.

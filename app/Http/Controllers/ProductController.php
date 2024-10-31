@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BusquedaproductoRequest;
+use App\Http\Requests\FiltroproductosRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Brand;
 use App\Models\Image;
@@ -64,7 +65,7 @@ class ProductController extends Controller
     public function productosRelacionados(Request $request)
     {
         $products = Product::where('productcategory_id', $request->categoria_id)
-        ->where('id', '!=', 1)
+        ->where('id', '!=', $request->producto_id) // excluimos del array el producto principal de la ficha de producto
         ->where('estado_producto', 'publicada')
         ->limit(3)->get();
         return ProductResource::collection(($products));
@@ -73,7 +74,7 @@ class ProductController extends Controller
     /**
      * Display a listing of products using a filter by prize, category and brand.
      */
-    public function filtrarProductos(Request $request)
+    public function filtrarProductos(FiltroproductosRequest $request)
     {
         $filtroCategoria = $request->categoria;
         $filtroMarca = $request->marca;

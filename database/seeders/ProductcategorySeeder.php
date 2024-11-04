@@ -29,8 +29,8 @@ class ProductcategorySeeder extends Seeder
         ]);
 
         Productcategory::create([
-            'nombre' => 'Relojes',
-            'slug' => 'relojes'
+            'nombre' => 'Cámaras',
+            'slug' => 'camaras'
         ]);
 
         Productcategory::create([
@@ -41,6 +41,11 @@ class ProductcategorySeeder extends Seeder
         Productcategory::create([
             'nombre' => 'Audio',
             'slug' => 'audio'
+        ]);
+
+        Productcategory::create([
+            'nombre' => 'Periféricos',
+            'slug' => 'perifericos'
         ]);
     }
 }

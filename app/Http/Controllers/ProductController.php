@@ -136,6 +136,17 @@ class ProductController extends Controller
     }
 
     /**
+     * Displays all products to checkout page using an array of ids.
+     */
+    public function indexById(string $idArray)
+    {
+        $ids = explode(",",$idArray); // Obtenemos las id del Array
+        $products = Product::find($ids); // Buscamos los productos en la base de datos con las id
+
+        return ProductResource::collection($products);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

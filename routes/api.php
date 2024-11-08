@@ -120,3 +120,4 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
     Route::post('/relatedProducts', [ProductController::class, 'productosRelacionados']);
     Route::post('/filtrarProductos', [ProductController::class, 'filtrarProductos']);
     Route::get('/buscarProductos', [ProductController::class, 'buscarProductos']);
+    Route::get('/obtenerProductosId/{idArray}', [ProductController::class, 'indexById']);

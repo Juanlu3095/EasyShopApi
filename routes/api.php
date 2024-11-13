@@ -13,6 +13,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProductcategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Models\Product;
@@ -121,3 +122,7 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
     Route::post('/filtrarProductos', [ProductController::class, 'filtrarProductos']);
     Route::get('/buscarProductos', [ProductController::class, 'buscarProductos']);
     Route::get('/obtenerProductosId/{idArray}', [ProductController::class, 'indexById']);
+
+    /* CUPONES */
+    Route::resource('/coupons', CouponController::class);
+    Route::post('/codigocupon', [CouponController::class, 'showByCode']);

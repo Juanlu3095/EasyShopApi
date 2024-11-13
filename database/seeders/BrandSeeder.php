@@ -14,23 +14,23 @@ class BrandSeeder extends Seeder
     public function run(): void
     {
         Brand::create([
-            'nombre' => 'MSI'
+            'nombre' => 'Befree'
         ]);
 
         Brand::create([
-            'nombre' => 'Philipps'
+            'nombre' => 'Happy shopping'
         ]);
 
         Brand::create([
-            'nombre' => 'HP'
+            'nombre' => 'No escape'
         ]);
 
         Brand::create([
-            'nombre' => 'Samsung'
+            'nombre' => 'Social addict'
         ]);
 
         Brand::create([
-            'nombre' => 'LG'
+            'nombre' => 'Solo play'
         ]);
         
     }

@@ -30,7 +30,8 @@ class DatabaseSeeder extends Seeder
             MessageSeeder::class,
             NewsletterSeeder::class,
             ProductcategorySeeder::class,
-            BrandSeeder::class
+            BrandSeeder::class,
+            CouponSeeder::class
         ]);
     }
 }

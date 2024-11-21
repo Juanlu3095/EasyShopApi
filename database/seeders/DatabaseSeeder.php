@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\Orderstatus;
 use App\Models\Productcategory;
 use Illuminate\Database\Seeder;
 
@@ -22,7 +23,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            UserSeeder::class,
+            /* UserSeeder::class,
             RoleSeeder::class,
             ProvinceSeeder::class,
             JobcategorySeeder::class,
@@ -31,7 +32,9 @@ class DatabaseSeeder extends Seeder
             NewsletterSeeder::class,
             ProductcategorySeeder::class,
             BrandSeeder::class,
-            CouponSeeder::class
+            CouponSeeder::class, */
+            PaymentmethodSeeder::class,
+            OrderstatusSeeder::class
         ]);
     }
 }

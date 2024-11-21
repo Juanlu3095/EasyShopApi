@@ -16,7 +16,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Models\Product;
+use App\Http\Controllers\PaymentmethodController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,3 +126,9 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
     /* CUPONES */
     Route::resource('/coupons', CouponController::class);
     Route::post('/codigocupon', [CouponController::class, 'showByCode']);
+
+    /* MÉTODOS DE PAGO */
+    Route::get('/metodopago', [PaymentmethodController::class, 'index']);
+    Route::get('/metodopago/{slug}', [PaymentmethodController::class, 'show']);
+    Route::put('/switchactivo/{slug}', [PaymentmethodController::class, 'switchActivo']);
+    Route::put('/metodopago/{slug}', [PaymentmethodController::class, 'update']);

@@ -32,4 +32,9 @@ class Product extends Model
     public function brand(): BelongsTo {
         return $this->belongsTo(Brand::class);
     }
+
+    // Relación 1:M con orderitems. 1 producto pertenece a varios orderitems
+    public function orderitems(): HasMany {
+        return $this->hasMany(Orderitem::class);
+    }
 }

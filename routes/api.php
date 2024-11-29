@@ -14,6 +14,8 @@ use App\Http\Controllers\ProductcategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderstatusController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PaymentmethodController;
@@ -129,6 +131,13 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* MÉTODOS DE PAGO */
     Route::get('/metodopago', [PaymentmethodController::class, 'index']);
+    Route::get('/pagosdisponibles', [PaymentmethodController::class, 'indexClient']); // Sólo para el frontend
     Route::get('/metodopago/{slug}', [PaymentmethodController::class, 'show']);
-    Route::put('/switchactivo/{slug}', [PaymentmethodController::class, 'switchActivo']);
+    Route::patch('/switchactivo/{slug}', [PaymentmethodController::class, 'switchActivo']); // Sólo se actualizará el 'activo' del método de pago
     Route::put('/metodopago/{slug}', [PaymentmethodController::class, 'update']);
+
+    /* PEDIDOS */
+    Route::resource('/pedidos', OrderController::class);
+    
+    /* ESTADOS DE LOS PEDIDOS */
+    Route::get('/estadospedido', [OrderstatusController::class, 'index']);

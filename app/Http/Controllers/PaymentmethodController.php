@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PaymentmethodRequest;
 use App\Http\Requests\PaymentmethodsoloactivoRequest;
+use App\Http\Resources\PaymentmethodclientResource;
 use App\Http\Resources\PaymentmethodResource;
 use App\Models\Paymentmethod;
 use Illuminate\Http\Request;
@@ -17,6 +18,15 @@ class PaymentmethodController extends Controller
     {
         $paymentmethods = Paymentmethod::all();
         return PaymentmethodResource::collection($paymentmethods);
+    }
+
+    /**
+     * Display a listing of the resource to frontend.
+     */
+    public function indexClient()
+    {
+        $paymentmethods = Paymentmethod::where('activo', 1)->get();
+        return PaymentmethodclientResource::collection($paymentmethods);
     }
 
     /**
@@ -53,7 +63,6 @@ class PaymentmethodController extends Controller
 
             return response()->json([
                 'result' => 'Método de pago actualizado.',
-                'data' => $request->activo
             ], 200);
 
         } else {
@@ -82,8 +91,7 @@ class PaymentmethodController extends Controller
             ]);
 
             return response()->json([
-                'result' => 'Método de pago actualizado.',
-                'data' => $request->configuracion
+                'result' => 'Método de pago actualizado.'
             ], 200);
 
         } else {

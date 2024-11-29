@@ -327,7 +327,6 @@ class ProductController extends Controller
                 'result' => 'No se ha podido procesar la petición.'
             ], 404);
         }
-        
-        
+          
     }
 }

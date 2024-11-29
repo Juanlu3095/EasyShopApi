@@ -23,10 +23,11 @@ return new class extends Migration
             $table->integer('telefono');
             $table->string('email');
             $table->text('notas')->nullable();
-            $table->unsignedBigInteger('paymentmethods_id')->constrained(table: 'paymentmethods', indexname: 'id');
+            $table->unsignedBigInteger('paymentmethod_id')->constrained(table: 'paymentmethods', indexname: 'id'); // paymentmethod_id en singular por la relacion en order.php
             $table->decimal('subtotal');
             $table->unsignedBigInteger('orderstatus_id')->constrained('orderstatuses')->default(2); // Para indicar si se ha pagado y/o se ha enviado.
             $table->string('nombre_descuento')->nullable(); // Guardamos el nombre del descuento por si se borra el cupón, para que al menos quede registrado
+            $table->string('tipo_descuento')->nullable();
             $table->decimal('descuento')->nullable();
             $table->decimal('total');
             $table->unsignedBigInteger('user_id')->constrained('users')->nullable()->default(null); // Si el usuario no está registrado, no podrá ver su pedido en la web

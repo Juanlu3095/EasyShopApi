@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Orderitem;
@@ -41,10 +42,10 @@ class OrderController extends Controller
     /**
      * Store a newly created order by client.
      */
-    public function store(Request $request)
+    public function store(OrderRequest $request)
     {
-        $user = auth('api')->user()->id ?? null;
-        $paymentmethod = Paymentmethod::where('slug', $request->metodopago)->first();
+        $user = auth('api')->user()->id ?? null; // Si el usuario está registrado se usará su id para asociarle el pedido
+        $paymentmethod = Paymentmethod::where('slug', $request->metodo_pago)->first();
 
         // Crear pedido y obtener id para pasarlo a cada item del pedido
         $order = new Order;
@@ -52,7 +53,7 @@ class OrderController extends Controller
         $order->apellidos = $request->apellidos;
         $order->pais = $request->pais;
         $order->direccion = $request->direccion;
-        $order->codigo_postal = $request->codigopostal;
+        $order->codigo_postal = $request->codigo_postal;
         $order->poblacion = $request->poblacion;
         $order->provincia = $request->provincia;
         $order->telefono = $request->telefono;
@@ -94,6 +95,94 @@ class OrderController extends Controller
             'result' => 'Pedido creado.',
             'data' => $order
         ], 201);
+    }
+
+    /**
+     * Store a newly created order by admin.
+     */
+    public function storeAdmin(OrderRequest $request)
+    {
+        $paymentmethod = Paymentmethod::where('slug', $request->metodo_pago)->first();
+
+        // Crear pedido y obtener id para pasarlo a cada item del pedido
+        $order = new Order;
+        $order->nombre = $request->nombre;
+        $order->apellidos = $request->apellidos;
+        $order->pais = $request->pais;
+        $order->direccion = $request->direccion;
+        $order->codigo_postal = $request->codigo_postal;
+        $order->poblacion = $request->poblacion;
+        $order->provincia = $request->provincia;
+        $order->telefono = $request->telefono;
+        $order->email = $request->email;
+        $order->notas = $request->notas;
+        $order->paymentmethod_id = $paymentmethod->id;
+        $order->subtotal = 0;
+        $order->nombre_descuento = $request->nombre_descuento;
+        $order->tipo_descuento = $request->tipo_descuento;
+        $order->descuento = $request->descuento;
+        $order->total = 0;
+        $order->user_id = $request->cuenta_cliente;
+        $order->save();
+
+        $orderid = $order->id;
+        
+        return response()->json([
+            'result' => 'Pedido creado.',
+            'data' => $orderid
+        ], 201);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(OrderRequest $request, string $order_id)
+    {
+        $order = Order::find($order_id);
+
+        if($order) {
+            $order->update([
+                'nombre' => $request->nombre,
+                'apellidos' => $request->apellidos,
+                'pais' => $request->pais,
+                'direccion' => $request->direccion,
+                'codigo_postal' => $request->codigo_postal,
+                'poblacion' => $request->poblacion,
+                'provincia' => $request->provincia,
+                'telefono' => $request->telefono,
+                'email' => $request->email,
+                'notas' => $request->notas,
+                'paymentmethod' => Paymentmethod::where('slug', $request->metodo_pago),
+                'orderstatus_id' => $request->estado,
+                'nombre_descuento' => $request->nombre_descuento,
+                'tipo_descuento' => $request->tipo_descuento,
+                'descuento' => $request->descuento,
+                'user_id' => $request->cuenta_cliente
+            ]);
+    
+            // Recalculamos el total del pedido. No el subtotal, por lo que la única cuantía que se puede modificar es el descuento que sólo afecta al total
+            if($order->tipo_descuento == 'Porcentual') {
+                $order->update([
+                    'total' => ($order->subtotal - ($order->subtotal * ($order->descuento / 100) ))
+                ]);  
+    
+            } else {
+                $order->update([
+                    'total' => ($order->subtotal - $order->descuento)
+                ]);  
+            }
+
+            return response()->json([
+                'result' => 'Pedido actualizado.',
+                'data' => $order
+            ], 200);
+
+        } else {
+            return response()->json([
+                'result' => 'Pedido no encontrado.'
+            ], 404);
+        }
+        
     }
 
     /**

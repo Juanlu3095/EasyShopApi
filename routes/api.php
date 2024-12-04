@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderitemController;
 use App\Http\Controllers\OrderstatusController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -138,6 +139,11 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* PEDIDOS */
     Route::resource('/pedidos', OrderController::class);
+    Route::post('pedidosadmin', [OrderController::class, 'storeAdmin']);
     
     /* ESTADOS DE LOS PEDIDOS */
     Route::get('/estadospedido', [OrderstatusController::class, 'index']);
+
+    /* PEDIDOS ITEM*/
+    Route::get('pedidositem/{idPedido}', [OrderitemController::class, 'indexByOrderId']);
+    Route::resource('/pedidoitem', OrderitemController::class);

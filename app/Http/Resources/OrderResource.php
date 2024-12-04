@@ -30,11 +30,12 @@ class OrderResource extends JsonResource
             'Metodo_pago' => $this->paymentmethod->slug,
             'Subtotal' => $this->subtotal,
             'Estado' => $this->orderstatus->valor,
+            'Estado_id' => $this->orderstatus_id,
             'Nombre_descuento' => $this->nombre_descuento,
             'Tipo_descuento' => $this->tipo_descuento,
             'Descuento' => $this->descuento,
             'Total' => $this->total . '€',
-            'Cuenta_cliente' => '',
+            'Cuenta_cliente' => $this->user_id,
             'Fecha' => $this->created_at->format('d-m-Y G:i'),
             'Productos' => $this->orderitems->map(function($orderitem) {
                 return [

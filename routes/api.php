@@ -79,6 +79,27 @@ Route::middleware('auth:sanctum', 'admin', 'verified')->group(function () {
 
     /* PRODUCTOS */
     Route::resource('/product', ProductController::class)->except(['index', 'show']);
+
+    /* CUPONES */
+    Route::resource('/coupons', CouponController::class);
+
+    /* MÉTODOS DE PAGO */
+    Route::get('/metodopago', [PaymentmethodController::class, 'index']);
+    Route::get('/metodopago/{slug}', [PaymentmethodController::class, 'show']);
+    Route::patch('/switchactivo/{slug}', [PaymentmethodController::class, 'switchActivo']); // Sólo se actualizará el 'activo' del método de pago
+    Route::put('/metodopago/{slug}', [PaymentmethodController::class, 'update']);
+
+    /* PEDIDOS */
+    Route::resource('/pedidos', OrderController::class)->except(['store']);
+    Route::post('pedidosadmin', [OrderController::class, 'storeAdmin']);
+    Route::post('/emailpedido', [OrderController::class, 'sendEmail']);
+
+    /* ESTADOS DE LOS PEDIDOS */
+    Route::get('/estadospedido', [OrderstatusController::class, 'index']);
+
+    /* PEDIDOS ITEM*/
+    Route::get('pedidositem/{idPedido}', [OrderitemController::class, 'indexByOrderId']);
+    Route::resource('/pedidoitem', OrderitemController::class);
 });
 
 // Grupo de rutas con middleware Sanctum y email verificado (Para clientes)
@@ -127,23 +148,13 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
     Route::get('/obtenerProductosId/{idArray}', [ProductController::class, 'indexById']);
 
     /* CUPONES */
-    Route::resource('/coupons', CouponController::class);
     Route::post('/codigocupon', [CouponController::class, 'showByCode']);
 
     /* MÉTODOS DE PAGO */
-    Route::get('/metodopago', [PaymentmethodController::class, 'index']);
     Route::get('/pagosdisponibles', [PaymentmethodController::class, 'indexClient']); // Sólo para el frontend
-    Route::get('/metodopago/{slug}', [PaymentmethodController::class, 'show']);
-    Route::patch('/switchactivo/{slug}', [PaymentmethodController::class, 'switchActivo']); // Sólo se actualizará el 'activo' del método de pago
-    Route::put('/metodopago/{slug}', [PaymentmethodController::class, 'update']);
+    Route::get('/transferencia', [PaymentmethodController::class, 'showTransferencia']);
 
     /* PEDIDOS */
-    Route::resource('/pedidos', OrderController::class);
-    Route::post('pedidosadmin', [OrderController::class, 'storeAdmin']);
-    
-    /* ESTADOS DE LOS PEDIDOS */
-    Route::get('/estadospedido', [OrderstatusController::class, 'index']);
+    Route::resource('/pedidos', OrderController::class)->only(['store']);
 
-    /* PEDIDOS ITEM*/
-    Route::get('pedidositem/{idPedido}', [OrderitemController::class, 'indexByOrderId']);
-    Route::resource('/pedidoitem', OrderitemController::class);
+    

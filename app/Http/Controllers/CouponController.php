@@ -73,7 +73,7 @@ class CouponController extends Controller
      */
     public function showByCode(Request $request)
     {
-        $coupon = Coupon::where('codigo', $request->codigo)->where('estado_cupon', 'Publicado')->first();
+        $coupon = Coupon::where('codigo', $request->codigo)->where('estado_cupon', 'Publicado')->where('limite_uso', '>', 0)->first();
 
         if($coupon) {
             return response()->json([

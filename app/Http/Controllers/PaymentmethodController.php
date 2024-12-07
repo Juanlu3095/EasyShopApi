@@ -49,6 +49,25 @@ class PaymentmethodController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function showTransferencia()
+    {
+        $paymentmethod = Paymentmethod::where('slug', 'transferencia')->first();
+
+        if($paymentmethod) {
+
+            return new PaymentmethodResource($paymentmethod);
+
+        } else {
+
+            return response()->json([
+                'result' => 'Método de pago no encontrado.'
+            ], 404);
+        }
+    }
+
+    /**
      * Activates or deactivates paymentmethod.
      */
     public function switchActivo(PaymentmethodsoloactivoRequest $request, string $slug)

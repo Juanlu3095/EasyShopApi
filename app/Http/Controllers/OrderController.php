@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
 use App\Http\Resources\OrderResource;
+use App\Mail\pedidotransferencia;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Orderitem;
 use App\Models\Paymentmethod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -46,6 +49,7 @@ class OrderController extends Controller
     {
         $user = auth('api')->user()->id ?? null; // Si el usuario está registrado se usará su id para asociarle el pedido
         $paymentmethod = Paymentmethod::where('slug', $request->metodo_pago)->first();
+        $coupon = Coupon::where('nombre', $request->nombre_descuento)->first();
 
         // Crear pedido y obtener id para pasarlo a cada item del pedido
         $order = new Order;
@@ -68,6 +72,12 @@ class OrderController extends Controller
         $order->user_id = $user;
         $order->save();
 
+        // Si hay descuento y aún tiene usos, descontamos del limite de usos
+        if($coupon && $coupon->limite_uso > 0) {
+            $coupon->limite_uso = $coupon->limite_uso - 1;
+            $coupon->save();
+        }
+
         $orderid = $order->id;
 
         // Creamos los items del pedido
@@ -87,13 +97,29 @@ class OrderController extends Controller
                 'product_id' => $producto['producto'],
                 'subtotal' => $producto['subtotal'],
                 'cantidad' => $producto['cantidad'],
-                'total' => $producto['total']
+                'total' => $producto['total'],
             ]);
         }
+
+        // Envio del email al cliente con los datos del pedido
+        $datos = array(
+            'referencia' => $orderid,
+            'nombre_cuenta' => json_decode($paymentmethod->configuracion, true)['nombre'], // true para que devuelva un array
+            'banco' => json_decode($paymentmethod->configuracion, true)['nombre_banco'],
+            'iban' => json_decode($paymentmethod->configuracion, true)['iban'],
+            'bic_swift' => json_decode($paymentmethod->configuracion, true)['bic_swift'],
+            'subtotal' => $request->subtotal,
+            'descuento' => $order->descuento ?? 0,
+            'tipo_descuento' => $order->tipo_descuento == 'Porcentual' ? '%' : '€',
+            'total' => $request->total,
+            'productos' => $request->productos
+        );
+
+        Mail::to($request->email)->send(new pedidotransferencia($datos));
         
         return response()->json([
             'result' => 'Pedido creado.',
-            'data' => $order
+            'data' => $orderid
         ], 201);
     }
 
@@ -211,5 +237,44 @@ class OrderController extends Controller
             ], 404);
         }
           
+    }
+
+    /**
+     * Sends email with order and payment info to client.
+     */
+    public function sendEmail(Request $request)
+    {
+        $order = Order::find($request->id);
+        $metodo_pago = Paymentmethod::find($order->paymentmethod_id);
+
+        // Datos del email
+        $datos = array(
+            'referencia' => $order->id,
+            'nombre_cuenta' => json_decode($metodo_pago->configuracion, true)['nombre'], // true para que devuelva un array
+            'banco' => json_decode($metodo_pago->configuracion, true)['nombre_banco'],
+            'iban' => json_decode($metodo_pago->configuracion, true)['iban'],
+            'bic_swift' => json_decode($metodo_pago->configuracion, true)['bic_swift'],
+            'subtotal' => $order->subtotal,
+            'descuento' => $order->descuento ?? 0, // Si usamos el operador lógico || va a salir 1 porque lo trata como un bool
+            'tipo_descuento' => $order->tipo_descuento == 'Porcentual' ? '%' : '€',
+            'total' => $order->total,
+            'productos' => $order->orderitems->map(function ($item) { // como hemos convertido una coleccion al usar eloquent en un rray tenemos que mapearlo para seleccionar las propiedades
+                return [
+                    'nombre_producto' => $item->product->nombre, // 'nombre_producto' es personalizable, pero lo usamos para reutilizar pedidotransferencia.blade.php
+                    'subtotal' => $item->subtotal,
+                    'cantidad' => $item->cantidad,
+                    'total' => $item->total
+                ];
+            })->toArray(), // Obtenemos los productos de orderitems asociados al pedido
+            
+        );
+
+        // Envio del email
+        Mail::to($order->email)->send(new pedidotransferencia($datos));
+
+        return response()->json([
+            'result' => 'Email enviado.',
+            'data' => $datos
+        ], 200);
     }
 }

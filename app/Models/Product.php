@@ -37,4 +37,9 @@ class Product extends Model
     public function orderitems(): HasMany {
         return $this->hasMany(Orderitem::class);
     }
+
+    // Relacion 1:M con sales. Un producto tiene muchas ventas
+    public function sales(): HasMany {
+        return $this->hasMany(Sale::class);
+    }
 }

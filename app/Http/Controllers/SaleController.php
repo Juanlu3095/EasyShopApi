@@ -13,7 +13,7 @@ class SaleController extends Controller
      */
     public static function indexByBenefits()
     {
-        $sales = Sale::orderBy('beneficios', 'desc')->get();
+        $sales = Sale::orderBy('beneficios', 'desc')->limit(10)->get();
 
         if($sales) {
             return response()->json([
@@ -34,7 +34,7 @@ class SaleController extends Controller
      */
     public static function indexByQuantity()
     {
-        $sales = Sale::orderBy('ventas', 'desc')->get();
+        $sales = Sale::orderBy('ventas', 'desc')->limit(10)->get();
 
         if($sales) {
             return response()->json([
@@ -48,4 +48,7 @@ class SaleController extends Controller
             ], 404);
         }
     }
+
+    // Nota: esta aproximación sólo permite mostrar los datos tal cual, sin filtro por unidad de tiempo, ya que para ello habría que crear cada venta por separado y luego
+    // juntarlas en el front-end.
 }

@@ -9,6 +9,7 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Orderitem;
 use App\Models\Paymentmethod;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -99,6 +100,27 @@ class OrderController extends Controller
                 'cantidad' => $producto['cantidad'],
                 'total' => $producto['total'],
             ]);
+
+            // Añadimos a ventas para las estadísticas
+            $sale = Sale::where('product_id', $producto['producto'])->first();
+
+            // Si el producto está en la tabla de ventas, actualiza beneficios y número de ventas
+            if($sale) {
+                $sale->update([
+                    'ventas' => $sale->ventas + $producto['cantidad'],
+                    'beneficios' => $sale->beneficios + $producto['total']
+                ]);
+
+            } else {
+
+                Sale::create([
+                    'product_id' => $producto['producto'],
+                    'ventas' => $producto['cantidad'],
+                    'beneficios' => $producto['total'],
+                ]);
+            }
+
+            
         }
 
         // Envio del email al cliente con los datos del pedido

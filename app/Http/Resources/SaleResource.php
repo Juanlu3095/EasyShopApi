@@ -15,7 +15,7 @@ class SaleResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'producto' => $this->product->nombre,
+            'producto' => $this->product->nombre, // $this representa a sale
             'beneficios' => $this->beneficios,
             'ventas' => $this->ventas
         ];

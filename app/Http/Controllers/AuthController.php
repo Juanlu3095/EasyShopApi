@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistroRequest;
+use App\Http\Requests\UserupdateRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -170,6 +171,35 @@ class AuthController extends Controller
             'message' => 'Usuario creado con éxito.'
         ], 201);
     }
+
+    /**
+     * It lets client to update email and password
+     */
+    public function actualizarCliente(UserupdateRequest $request)
+    {
+        $userId = auth()->user()->id;
+        $user = User::find($userId);
+
+        if($user) {
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password)
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Datos actualizados.'
+            ], 200);
+
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Usuario no encontrado.'
+            ], 404);
+        }
+ 
+    }   
 
     /**
      * It verifies the user once you click the button inside the email

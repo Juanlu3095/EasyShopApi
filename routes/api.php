@@ -112,6 +112,15 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* USUARIOS */
     Route::get('/dataclient', [AuthController::class, 'dataclient'])->name('client.data');
+    Route::post('/actualizarcliente', [AuthController::class, 'actualizarCliente']); // Para actualizar el usuario desde el panel del cliente
+    Route::post('/cerrarsesioncliente', [AuthController::class, 'logout']);
+
+    /* PEDIDOS */
+    Route::get('/pedidoscliente', [OrderController::class, 'indexByClient']);
+    Route::post('/pedidocliente', [OrderController::class, 'showToClient']);
+
+    /* PEDIDOS ITEM */
+    Route::post('/pedidoitemclient', [OrderitemController::class, 'getPedidosItemClient']);
 });
 
 // Rutas sin protección con sanctum (Para usuarios que no necesitan estar logueados)

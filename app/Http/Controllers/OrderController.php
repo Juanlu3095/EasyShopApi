@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OrderclientRequest;
 use App\Http\Requests\OrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Mail\pedidotransferencia;
@@ -42,6 +43,44 @@ class OrderController extends Controller
         
     }
 
+    /**
+     * Show order by user id to client.
+     */
+    public function showToClient(OrderclientRequest $request)
+    {
+        $order = Order::find($request->idPedido);
+
+        if($order) {
+            return new OrderResource($order);
+
+        } else {
+            return response()->json([
+                'result' => 'No se ha encontrado el pedido.'
+            ], 404);
+        }
+    }
+
+    /**
+     * Show orders by user id (customers).
+     */
+    public function indexByClient()
+    {
+        $user = auth()->user();
+
+        if($user && $user->role_id === 3) {
+            $orders = Order::where('user_id', $user->id)->get();
+
+            return response()->json([
+                'result' => 'Pedidos encontrados.',
+                'data' => OrderResource::collection($orders)
+            ], 200);
+
+        } else {
+            return response()->json([
+                'result' => 'No tiene pedidos en el sistema.'
+            ], 404);
+        }
+    }
 
     /**
      * Store a newly created order by client.

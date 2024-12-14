@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OrderitemclientRequest;
 use App\Http\Requests\OrderitemRequest;
 use App\Http\Resources\OrderitemResource;
 use App\Models\Order;
@@ -36,6 +37,28 @@ class OrderitemController extends Controller
             ], 404);
         }
         
+    }
+
+    /**
+     * Show products by Order Id given by client.
+     */
+    public function getPedidosItemClient(OrderitemclientRequest $request)
+    {
+        $user = auth()->user()->id;
+        $order = Order::find($request->idPedido);
+        $orderitems = Orderitem::where('order_id', $request->idPedido)->get();
+
+        if($orderitems && $order->user_id === $user) { // Comprobamos que el cliente al que pertenece el pedido y el usuario que realizó la solicitud coincidan
+            return response()->json([
+                'result' => 'Se han encontrado productos.',
+                'data' => OrderitemResource::collection($orderitems)
+            ], 200);
+
+        } else {
+            return response()->json([
+                'result' => 'No se han encontrado los productos.'
+            ], 404);
+        }
     }
 
     /**

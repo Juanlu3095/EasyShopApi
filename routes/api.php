@@ -21,6 +21,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PaymentmethodController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +106,10 @@ Route::middleware('auth:sanctum', 'admin', 'verified')->group(function () {
     /* VENTAS */
     Route::get('ventasporbeneficio', [SaleController::class, 'indexByBenefits']);
     Route::get('ventasporcantidad', [SaleController::class, 'indexByQuantity']);
+    
+    /* CONFIGURACIÓN */
+    Route::resource('/ajustes', SettingController::class)->only(['index', 'update']);
+    Route::post('/ajuste', [SettingController::class, 'showbyname']);
 });
 
 // Grupo de rutas con middleware Sanctum y email verificado (Para clientes)

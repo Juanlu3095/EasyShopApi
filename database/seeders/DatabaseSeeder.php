@@ -32,9 +32,10 @@ class DatabaseSeeder extends Seeder
             NewsletterSeeder::class,
             ProductcategorySeeder::class,
             BrandSeeder::class,
-            CouponSeeder::class, */
+            CouponSeeder::class, 
             PaymentmethodSeeder::class,
-            OrderstatusSeeder::class
+            OrderstatusSeeder::class,*/
+            SettingSeeder::class
         ]);
     }
 }

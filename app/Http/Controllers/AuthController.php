@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\loginAdmin;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+//use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Requests\EmailverificationRequest;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset; 
@@ -206,9 +207,9 @@ class AuthController extends Controller
     }   
 
     /**
-     * It verifies the user once you click the button inside the email
+     * It verifies the user once you click the button inside the email. It uses custom Email verification request.
      */
-    public function verificarEmail(EmailVerificationRequest $request)
+    public function verificarEmail(EmailverificationRequest $request)
     {
         $user = User::find($request->id);
         //$user->email_verified_at = now(); // Marcamos el email como verificado en la base de datos

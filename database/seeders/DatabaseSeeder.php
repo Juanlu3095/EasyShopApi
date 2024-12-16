@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            /* UserSeeder::class,
+            UserSeeder::class,/*
             RoleSeeder::class,
             ProvinceSeeder::class,
             JobcategorySeeder::class,
@@ -34,8 +34,8 @@ class DatabaseSeeder extends Seeder
             BrandSeeder::class,
             CouponSeeder::class, 
             PaymentmethodSeeder::class,
-            OrderstatusSeeder::class,*/
-            SettingSeeder::class
+            OrderstatusSeeder::class,
+            SettingSeeder::class*/
         ]);
     }
 }

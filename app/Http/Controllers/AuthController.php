@@ -17,10 +17,13 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\PasswordReset; 
+use App\Traits\Emailadmin;
 
 class AuthController extends Controller
 {
+    use Emailadmin;
+
     /**
      * Login ONLY for users with client role.
      */
@@ -89,7 +92,8 @@ class AuthController extends Controller
             'host' => $ubicacion->hostname
         );
 
-        Mail::to('jcooldevelopment@gmail.com')->send(new loginAdmin($datos)); // Enviamos correo al admin para notificarle del acceso.
+        $email = $this->adminEmail(); // Obtenemos el email de administración
+        Mail::to($email)->send(new loginAdmin($datos)); // Enviamos correo al admin para notificarle del acceso.
 
         return response()->json([
             'status' => true,

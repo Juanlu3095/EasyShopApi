@@ -5,17 +5,22 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderclientRequest;
 use App\Http\Requests\OrderRequest;
 use App\Http\Resources\OrderResource;
+use App\Mail\outofstock;
 use App\Mail\pedidotransferencia;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Orderitem;
 use App\Models\Paymentmethod;
+use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Traits\Emailadmin;
 
 class OrderController extends Controller
 {
+    use Emailadmin;
+
     /**
      * Show all orders in storage.
      */
@@ -123,6 +128,26 @@ class OrderController extends Controller
         // Creamos los items del pedido
         // Usamos foreach porque map no nos permite incluir dentro la variable $orderid si no usamos use
         foreach ($request->productos as $producto) {
+
+            // Descontamos los productos del inventario si lo hemos habilitado. Dejamos que compre el producto aunque no haya existencias.
+            $product = Product::find($producto['producto']);
+            if($product->inventario) {
+                if($product->inventario <= $producto['cantidad']) {
+                    $email = $this->adminEmail(); // Obtenemos el email de administración
+
+                    $data = array(
+                        'producto' => $product->nombre 
+                    );
+
+                    Mail::to($email)->send(new outofstock($data)); // Mandamos el email a admin si el producto se va a quedar sin existencias
+                }
+
+                // Actualizamos el inventario
+                $product->update([
+                    'inventario' => $product->inventario - $producto['cantidad']
+                ]);
+            }
+
             /* $orderitem = new Orderitem;
             $orderitem->order_id = $orderid;
             $orderitem->product_id = $producto['producto'];
@@ -159,7 +184,6 @@ class OrderController extends Controller
                 ]);
             }
 
-            
         }
 
         // Envio del email al cliente con los datos del pedido

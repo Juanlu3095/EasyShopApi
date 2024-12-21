@@ -31,6 +31,8 @@ return new class extends Migration
             $table->decimal('descuento')->nullable();
             $table->decimal('total');
             $table->unsignedBigInteger('user_id')->constrained('users')->nullable()->default(null); // Si el usuario no está registrado, no podrá ver su pedido en la web
+            $table->unsignedBigInteger('shippingmethod_id')->constrained(table: 'shippingmethods', indexname: 'id'); // shippingmethods_id en singular por la relacion en order.php
+            $table->decimal('gastos_envio')->default(0);
             $table->timestamps();
         });
     }

@@ -29,4 +29,9 @@ class Order extends Model
     public function orderstatus(): BelongsTo {
         return $this->belongsTo(Orderstatus::class);
     }
+
+    // Relación 1:M con Shippingmethod
+    public function shippingmethod(): BelongsTo {
+        return $this->belongsTo(Shippingmethod::class);
+    }
 }

@@ -20,6 +20,8 @@ class pedidotransferencia extends Mailable
     public string $iban;
     public string $bic_swift;
     public float $subtotal;
+    public string $metodo_envio;
+    public float $gastos_envio;
     public float $descuento;
     public string $tipo_descuento;
     public float $total;
@@ -35,6 +37,8 @@ class pedidotransferencia extends Mailable
         $this->iban = $datos['iban'];
         $this->bic_swift = $datos['bic_swift'];
         $this->subtotal = $datos['subtotal'];
+        $this->metodo_envio = $datos['metodo_envio'];
+        $this->gastos_envio = $datos['gastos_envio'];
         $this->descuento = $datos['descuento'];
         $this->tipo_descuento = $datos['tipo_descuento'];
         $this->total = $datos['total'];

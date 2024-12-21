@@ -22,6 +22,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PaymentmethodController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ShippingmethodController;
+use App\Models\Shippingmethod;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +128,9 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* PEDIDOS ITEM */
     Route::post('/pedidoitemclient', [OrderitemController::class, 'getPedidosItemClient']);
+
+    /* MÉTODOS DE ENVÍO */
+    Route::resource('/metodosenvio', ShippingmethodController::class)->except(['index']);
 });
 
 // Rutas sin protección con sanctum (Para usuarios que no necesitan estar logueados)
@@ -175,3 +180,6 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* PEDIDOS */
     Route::resource('/pedidos', OrderController::class)->only(['store']);
+
+    /* MÉTODOS DE ENVÍO */
+    Route::resource('/metodosenvio', ShippingmethodController::class)->only(['index']);

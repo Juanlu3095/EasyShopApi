@@ -37,6 +37,8 @@ class OrderRequest extends FormRequest
             'nombre_descuento' => 'string|nullable|min:1',
             'tipo_descuento' => 'string|nullable|in:Fijo,Porcentual',
             'descuento' => 'numeric|nullable',
+            'metodo_envio' => 'numeric|required|min:1',
+            'gastos_envio' => 'numeric|required'
         ];
 
         // Reglas que se añaden dependiendo del tipo de método

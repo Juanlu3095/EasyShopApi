@@ -115,6 +115,8 @@ class OrderController extends Controller
         $order->descuento = $request->descuento;
         $order->total = $request->total;
         $order->user_id = $user;
+        $order->shippingmethod_id = $request->metodo_envio;
+        $order->gastos_envio = $request->gastos_envio;
         $order->save();
 
         // Si hay descuento y aún tiene usos, descontamos del limite de usos
@@ -194,6 +196,8 @@ class OrderController extends Controller
             'iban' => json_decode($paymentmethod->configuracion, true)['iban'],
             'bic_swift' => json_decode($paymentmethod->configuracion, true)['bic_swift'],
             'subtotal' => $request->subtotal,
+            'metodo_envio' => $order->shippingmethod->nombre,
+            'gastos_envio' => $request->gastos_envio,
             'descuento' => $order->descuento ?? 0,
             'tipo_descuento' => $order->tipo_descuento == 'Porcentual' ? '%' : '€',
             'total' => $request->total,
@@ -234,6 +238,8 @@ class OrderController extends Controller
         $order->descuento = $request->descuento;
         $order->total = 0;
         $order->user_id = $request->cuenta_cliente;
+        $order->shippingmethod_id = $request->metodo_envio;
+        $order->gastos_envio = $request->gastos_envio;
         $order->save();
 
         $orderid = $order->id;
@@ -268,7 +274,9 @@ class OrderController extends Controller
                 'nombre_descuento' => $request->nombre_descuento,
                 'tipo_descuento' => $request->tipo_descuento,
                 'descuento' => $request->descuento,
-                'user_id' => $request->cuenta_cliente
+                'user_id' => $request->cuenta_cliente,
+                'shippingmethod_id' => $request->metodo_envio,
+                'gastos_envio' => $request->gastos_envio
             ]);
     
             // Recalculamos el total del pedido. No el subtotal, por lo que la única cuantía que se puede modificar es el descuento que sólo afecta al total
@@ -340,6 +348,8 @@ class OrderController extends Controller
             'iban' => json_decode($metodo_pago->configuracion, true)['iban'],
             'bic_swift' => json_decode($metodo_pago->configuracion, true)['bic_swift'],
             'subtotal' => $order->subtotal,
+            'metodo_envio' => $order->shippingmethod->nombre,
+            'gastos_envio' => $order->gastos_envio,
             'descuento' => $order->descuento ?? 0, // Si usamos el operador lógico || va a salir 1 porque lo trata como un bool
             'tipo_descuento' => $order->tipo_descuento == 'Porcentual' ? '%' : '€',
             'total' => $order->total,

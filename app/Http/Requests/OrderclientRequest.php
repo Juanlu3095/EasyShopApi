@@ -12,8 +12,8 @@ class OrderclientRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Comprobamos que el solicitante es un usuario con cuenta en la aplicación
-        if(!$this->user()->id) {
+        // Comprobamos que el solicitante es un usuario con cuenta de cliente en la aplicación
+        if($this->user()->role_id !== 3) {
             return false;
         }
 

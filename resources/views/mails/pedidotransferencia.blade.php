@@ -43,6 +43,12 @@
 @endforeach
 
 <span>
+    <strong>Método de envío:</strong> {{ $metodo_envio }} - {{ $gastos_envio }}€
+</span>
+
+<br>
+
+<span>
     <strong>Descuento:</strong> - {{ $descuento ? $descuento : 0.00 }}{{ $tipo_descuento }}
 </span>
 

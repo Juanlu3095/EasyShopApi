@@ -60,14 +60,6 @@ class ShippingmethodController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(ShippingmethodRequest $request, string $id)
@@ -82,7 +74,7 @@ class ShippingmethodController extends Controller
 
             return response()->json([
                 'result' => 'Método de envío actualizado',
-                'data' => $shippingmethod
+                'data' => new ShippingmethodResource($shippingmethod)
             ], 200);
 
         } else {

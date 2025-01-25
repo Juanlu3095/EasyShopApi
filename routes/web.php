@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RedsysController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +30,7 @@ Route::get('/reset-password/{token}', function (string $token) {
 })->middleware('guest')->name('password.reset');
 
 Route::post('/reset-password', [AuthController::class, 'ResetPassword'])->middleware('guest')->name('password.update'); // Permite cambiar contraseña
+
+Route::get('/pagotarjeta/ok', [RedsysController::class, 'ok'])->name('redsys.ok'); // Donde se trata la solicitud con pago Redsys correcto
+Route::get('/pagotarjeta/ko', [RedsysController::class, 'ko'])->name('redsys.ko'); // Donde se trata la solicitud con pago Redsys incorrecto
+Route::post('/pagotarjeta/notification', [RedsysController::class, 'notificaction'])->name('redsys.notification'); // Donde se tratan datos más sensibles con pagos ok

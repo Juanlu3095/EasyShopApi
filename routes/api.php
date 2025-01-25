@@ -20,6 +20,7 @@ use App\Http\Controllers\OrderstatusController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PaymentmethodController;
+use App\Http\Controllers\RedsysController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShippingmethodController;
@@ -183,3 +184,6 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* MÉTODOS DE ENVÍO */
     Route::resource('/metodosenvio', ShippingmethodController::class)->only(['index']);
+
+    /* REDSYS */
+    Route::post('/pagotarjeta', [RedsysController::class, 'pagoTarjeta'])->name('redsys.pagar');

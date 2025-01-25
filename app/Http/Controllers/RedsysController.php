@@ -150,7 +150,7 @@ class RedsysController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'result' => 'Ha ocurrido un error.'
-            ], 500);
+            ], 500); // Comprobar que este sea el error adecuado
         }
     }
 

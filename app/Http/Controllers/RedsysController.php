@@ -145,12 +145,12 @@ class RedsysController extends Controller
 
             return response()->json([
                 'form' => Redsys::createForm() // devuelve el formulario al frontend
-            ]);
+            ], 200);
 
         } catch (Exception $e) {
             return response()->json([
                 'result' => 'Ha ocurrido un error.'
-            ], 404);
+            ], 500);
         }
     }
 

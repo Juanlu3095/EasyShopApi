@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('alt')->nullable();
             $table->text('descripcion')->nullable();
             $table->string('leyenda')->nullable();
-            $table->string('ruta_archivo')->unique(); // REVISAR ESTO
+            $table->string('ruta_archivo')->unique();
+            $table->string('nombre_archivo')->unique();
             $table->unsignedBigInteger('imageable_id')->nullable(); // Para la relación polimórfica con Productcategory y productos, se relaciona con la id de éstos
             $table->string('imageable_type')->nullable(); // Contiene la tabla con la que se relaciona: Productcategory o productos. Relación polimórfica 1:Muchos.
             $table->timestamps();

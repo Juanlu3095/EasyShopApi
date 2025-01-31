@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageRequest;
 use App\Http\Resources\ImageResource;
+use App\Models\Error;
 use App\Models\Image;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Yaza\LaravelGoogleDriveStorage\Gdrive;
 
 class ImageController extends Controller
 {
@@ -42,33 +45,61 @@ class ImageController extends Controller
         if ($request->hasFile('archivo')) {
             $file = $request->file('archivo');
             $filename = $file->getClientOriginalName(); // Para coger el nombre que ya traía el archivo
-            $rutaTemporal = 'public/media/' . $filename;
 
-            if(Storage::exists($rutaTemporal)) { // Comprobamos que el archivo a subir no exista ya en el storage, y si es así le cambiamos el nombre
-                $newfilename = time() . '_' . $filename; // time() no puede ir después de $filename, ya que $filename acaba en .png
-
-                $file->storeAs('public/media', $newfilename); // Guardar archivo en storage
-                $rutaReal = 'media/' . $newfilename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
-                $image->ruta_archivo = $rutaReal;
-
-            } else {
-                $file->storeAs('public/media', $filename); // Guardar archivo en storage
-                $rutaReal = 'media/' . $filename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
-                $image->ruta_archivo = $rutaReal;
+            try {
+                // Debemos declarar esto aquí, porque si lo hacemos fuera de try/catch producirá un error si no existe la carpeta
+                Gdrive::all("easyshop/images"); // Obtenemos todos los archivos en la ruta indicada en este momento
+            } catch (Exception $e) {
+                Gdrive::makeDir('easyshop/images'); // Si no existe la carpeta, la creamos
             }
             
-            
-            $image->save();
+            try {
+                // PROBLEMA: SI NO HAY ARCHIVOS EN LA RUTA INDICADA DA ERROR SI USAMOS GDRIVE:ALL()
+                $data = Gdrive::all("easyshop/images/"); // Obtenemos todos los archivos en la ruta indicada antes de cualquier otro cambio
+                $paths = array_column(json_decode($data), 'path'); // Obtenemos todas las rutas (path) de los archivos que hay en la ruta $data
+    
+                if ($data && in_array("easyshop/images/$filename", $paths)) { // Si hay un archivo con el mismo nombre
+                    $newnamefile = 'image_' . time() . '.' . $file->guessExtension();
+                    $image->nombre_archivo = $newnamefile;
+                    Gdrive::put("easyshop/images/$newnamefile", $file); // Creamos un nuevo nombre
+    
+                    $updatedData = Gdrive::all("easyshop/images/");
+                    $imageId = array_search("easyshop/images/$newnamefile", array_column(json_decode($updatedData, true), 'path')); // Usar $updatedData que está actualizado
+                    $image->ruta_archivo = $updatedData[$imageId]['extra_metadata']['id']; // AQUÍ FUNCIONA $data PORQUE HEMOS COMPROBADO QUE EXISTE EN EL IF
+                } else {
+                    $image->nombre_archivo = $filename; 
+                    Gdrive::put("easyshop/images/$filename", $file);
+
+                    $updatedData = Gdrive::all("easyshop/images/"); // SI SE USA $data SE OBTENDRÁN LOS DATOS DE ANTES DE GUARDAR EL ARCHIVO
+                    $imageId = array_search("easyshop/images/$filename", array_column(json_decode($updatedData, true), 'path'));
+                    $image->ruta_archivo = $updatedData[$imageId]['extra_metadata']['id']; 
+                }
+                
+                $image->save();
+
+            } catch (Exception $error) {
+
+                Error::create([
+                    'funcion' => 'ImageController@store',
+                    'mensaje' => $error->getMessage(),
+                    'archivo' => $error->getFile(),
+                    'linea' => $error->getLine()
+                ]);
+                
+                return response()->json([
+                    'result' => 'Error al procesar la imagen.'
+                ], 400);
+            }
 
             return response()->json([
-                'result' => 'Imagen guardada.'
+                'result' => 'Imagen guardada.',
+                'data' => $image // ESTO HAY QUE CAMBIARLO POR SU RESOURCE
             ], 201);
 
         } else {
             return response()->json(['error' => 'No se proporcionó un archivo válido.'], 400);
         }
 
-        
     }
 
     /**
@@ -115,11 +146,12 @@ class ImageController extends Controller
     public function destroy(string $id)
     {
         $image = Image::find($id);
-        $imageFile = Storage::disk('public')->exists($image->ruta_archivo);
+        $driveFiles = Gdrive::all('easyshop/images');
 
         if($image) {
-            if($imageFile) { // Si existe el archivo en el storage, lo eliminamos.
-                Storage::disk('public')->delete($image->ruta_archivo);
+            // Comprobamos que el archivo existe en Drive, y si es así lo eliminamos
+            if (in_array("easyshop/images/$image->nombre_archivo", array_column(json_decode($driveFiles, true), 'path'))) {
+                Gdrive::delete("easyshop/images/$image->nombre_archivo");
             }
             $image->delete();
 
@@ -132,6 +164,5 @@ class ImageController extends Controller
                 'result' => 'Imagen no encontrada.'
             ], 404);
         }
-
     }
 }

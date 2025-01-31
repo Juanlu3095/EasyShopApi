@@ -11,7 +11,7 @@ class Image extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'alt', 'descripcion', 'leyenda', 'ruta_archivo', 'imageable_id', 'imageable_type']; // imageable_id e imageable_type deberían modificarse desde laravel
+    protected $fillable = ['nombre', 'alt', 'descripcion', 'leyenda', 'ruta_archivo', 'nombre_archivo', 'imageable_id', 'imageable_type']; // imageable_id e imageable_type deberían modificarse desde laravel
 
     public function imageable(): MorphTo {
         return $this->morphTo(); // Tanto categorias de producto como productos como marcas pueden tener muchas imágenes

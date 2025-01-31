@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Cv;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
+use Yaza\LaravelGoogleDriveStorage\Gdrive;
 
 class CvController extends Controller
 {
@@ -59,32 +60,42 @@ class CvController extends Controller
         
         // Manejo del archivo
         if ($request->hasFile('ruta_cv')) {
-        $file = $request->file('ruta_cv');
-        $filename = "cv_job" . $cv->job_id . '_' . time() . "." . $file->guessExtension();
-        $path = $file->storeAs('public/cv', $filename); // Guardar archivo en storage
-        $rutaReal = 'cv/' . $filename; // La ruta del archivo que se guarda en la base de datos y desde la que se puede acceder al archivo desde la web
-        //$rutaReal = Storage::url('cv/' . $filename); // Otra forma de guardar la ruta del archivo, más recomendable porque si se cambia el disco, las modificaciones son más simples.
-        $cv->ruta_cv = $rutaReal; // Guardamos ruta relativa en ruta_cv en la base de datos
+            
+            $file = $request->file('ruta_cv');
+            $filename = "cv_job" . $cv->job_id . '_' . time() . "." . $file->guessExtension();
 
-        // Envío de email de confirmación al candidato
-        $job = $cv->job->puesto; // relación 1:Muchos entre cv y job, 1 job muchos cvs
+            Gdrive::put("easyshop/cv/$filename", $file); // guardamos el archivo en Drive
 
-        $datos = Array(
-            'nombre' => $cv->nombre,
-            'job' => $job
-        );
+            $allfiles = Gdrive::all("easyshop/cv/"); // Obtenemos todos los archivos de la carpeta indicada
+            // array_column devuelve sólo los valores de la columna 'path'
+            // array_search nos devuelve la fila (index) que corresponde con la url del primer parámetro. El segundo parámetro es el array, usamos json_decode porque Drive nos
+            // devuelve un json
+            $updatedfileId = array_search("easyshop/cv/$filename", array_column(json_decode($allfiles, true), 'path'));
+            
+            // Guardamos la URL o ID del archivo y su nombre
+            $cv->nombre_archivo = $filename;
+            $cv->ruta_cv = $allfiles[$updatedfileId]['extra_metadata']['id']; // La ruta absoluta sería: https://drive.google.com/file/d/$cv->ruta_cv
+            $cv->save();
+            
+            // Envío de email de confirmación al candidato
+            $job = $cv->job->puesto; // relación 1:Muchos entre cv y job, 1 job muchos cvs
 
-        Mail::to($cv->email)->send(new jobapplication($datos));
+            $datos = Array(
+                'nombre' => $cv->nombre,
+                'job' => $job
+            );
+
+            Mail::to($cv->email)->send(new jobapplication($datos));
 
         } else {
             return response()->json(['error' => 'No se proporcionó un archivo PDF válido.'], 400);
         }
         
         $cv->save();
-        
+
         return response()->json([
             'success' => true,
-            'data' => $request
+            'data' => $allfiles[$updatedfileId]['extra_metadata']['id']
         ], 201);
     }
 
@@ -133,11 +144,12 @@ class CvController extends Controller
         if( $cv ) {
             
             foreach ($cv as $row) {
-                if(Storage::disk('public')->exists($row->ruta_cv)) {
-                    Storage::disk('public')->delete($row->ruta_cv); // Si existe el archivo del cv, lo eliminará. Debemos pasar la ruta a delete().  
-                } 
-                Cv::destroy(explode(",",$idArray)); // Elimina las candidaturas seleccionadas para el empleo concreto
+                if($row->nombre_archivo) {
+                    Gdrive::delete("easyshop/cv/$row->nombre_archivo");
+                }
             }
+
+            Cv::destroy(explode(",",$idArray)); // Elimina las candidaturas seleccionadas para el empleo concreto */
  
             return response()->json([
                 'success' => true,

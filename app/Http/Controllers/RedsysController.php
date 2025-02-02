@@ -15,6 +15,7 @@ use App\Models\Sale;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\outofstock;
 use App\Mail\pedidotarjeta;
+use App\Models\Error;
 
 class RedsysController extends Controller
 {
@@ -196,6 +197,12 @@ class RedsysController extends Controller
             }
         }
         return response()->json(data: ['Success' => false, 'message' => $request->all()]); */
+        Error::create([
+            'funcion' => 'a',
+            'mensaje' => 'a',
+            'archivo' => 'a',
+            'linea' => 1
+        ]);
     }
 
 }

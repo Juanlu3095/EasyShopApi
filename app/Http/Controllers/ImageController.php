@@ -8,6 +8,7 @@ use App\Models\Error;
 use App\Models\Image;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Yaza\LaravelGoogleDriveStorage\Gdrive;
 use Google\Client;
 use Google\Service\Drive;
@@ -58,14 +59,27 @@ class ImageController extends Controller
             $client = new Client();
             $client->setClientId(config('filesystems.disks.google.clientId'));
             $client->setClientSecret(config('filesystems.disks.google.clientSecret'));
-            $accessToken = $client->fetchAccessTokenWithRefreshToken(config('filesystems.disks.google.refreshToken'));
-            $client->setAccessToken($accessToken);
+            $accessToken = Cache::get('accessToken'); // Obtenemos el accessToken de la caché
+
+            // Comprobamos que exista $accessToken en la caché, y si es así se lo pasamos al cliente.
+            // Ponemos esto aquí porque si lo ponemos en un else en el if de debajo, entrará en el primer if ya que se cumple $client->isAccessTokenExpired()
+            // Tener en cuenta que setAccessToken($accessToken) puede dar error su el token no existe o es null y parar el programa
+            if($accessToken) {
+                $client->setAccessToken($accessToken);
+            }
+
+            // Comprobamos si el token está en caché o si el token del cliente ha expirado
+            if (!$accessToken || $client->isAccessTokenExpired()) {
+                $newAccessToken = $client->fetchAccessTokenWithRefreshToken(config('filesystems.disks.google.refreshToken'));
+                Cache::put('accessToken', $newAccessToken, now()->addMinutes(55));
+                $client->setAccessToken($newAccessToken);
+            }
 
             $service = new Drive($client);
 
-            $permisos = new Drive\Permission();
-            $permisos->setRole('reader');
-            $permisos->setType('anyone');
+            $permisos = new Drive\Permission(); // Para dar establecer permisos con los archivos a subir
+            $permisos->setRole('reader'); // Asignamos el rol que va a tener
+            $permisos->setType('anyone'); // Permitimos el acceso a cualquiera con el link
             
             try {
                 // PROBLEMA: SI NO HAY ARCHIVOS EN LA RUTA INDICADA DA ERROR SI USAMOS GDRIVE:ALL()

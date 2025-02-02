@@ -187,3 +187,4 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     /* REDSYS */
     Route::post('/pagotarjeta', [RedsysController::class, 'pagoTarjeta'])->name('redsys.pagar');
+

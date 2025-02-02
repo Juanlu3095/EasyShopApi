@@ -1,20 +1,26 @@
+# Usar PHP 8.1 FPM basado en Alpine
 FROM php:8.1-fpm-alpine
 
-COPY . .
+# Instalar dependencias necesarias, incluidas las extensiones de PHP
+RUN apk update && apk add --no-cache \
+    nginx \
+    bash \
+    && docker-php-ext-install pdo pdo_mysql
 
-# Image config
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+# Configurar el directorio de trabajo
+WORKDIR /var/www/html
 
-# Laravel config
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
+# Copiar el código fuente de tu aplicación Laravel
+COPY . /var/www/html
 
-# Allow composer to run as root
-ENV COMPOSER_ALLOW_SUPERUSER 1
+# Copiar el archivo de configuración de Nginx
+COPY ./nginx/default.conf /etc/nginx/conf.d/
 
-CMD ["/start.sh"]
+# Establecer los permisos adecuados para las carpetas de almacenamiento y caché
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Exponer el puerto 80 para Nginx
+EXPOSE 80
+
+# Comando para iniciar PHP-FPM y Nginx
+CMD ["sh", "-c", "php-fpm & nginx -g 'daemon off;'"]

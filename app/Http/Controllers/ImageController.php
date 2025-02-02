@@ -8,8 +8,9 @@ use App\Models\Error;
 use App\Models\Image;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Yaza\LaravelGoogleDriveStorage\Gdrive;
+use Google\Client;
+use Google\Service\Drive;
 
 class ImageController extends Controller
 {
@@ -52,6 +53,19 @@ class ImageController extends Controller
             } catch (Exception $e) {
                 Gdrive::makeDir('easyshop/images'); // Si no existe la carpeta, la creamos
             }
+
+            // Creación de cliente y servicio con los que manejar permisos
+            $client = new Client();
+            $client->setClientId(config('filesystems.disks.google.clientId'));
+            $client->setClientSecret(config('filesystems.disks.google.clientSecret'));
+            $accessToken = $client->fetchAccessTokenWithRefreshToken(config('filesystems.disks.google.refreshToken'));
+            $client->setAccessToken($accessToken);
+
+            $service = new Drive($client);
+
+            $permisos = new Drive\Permission();
+            $permisos->setRole('reader');
+            $permisos->setType('anyone');
             
             try {
                 // PROBLEMA: SI NO HAY ARCHIVOS EN LA RUTA INDICADA DA ERROR SI USAMOS GDRIVE:ALL()
@@ -66,13 +80,17 @@ class ImageController extends Controller
                     $updatedData = Gdrive::all("easyshop/images/");
                     $imageId = array_search("easyshop/images/$newnamefile", array_column(json_decode($updatedData, true), 'path')); // Usar $updatedData que está actualizado
                     $image->ruta_archivo = $updatedData[$imageId]['extra_metadata']['id']; // AQUÍ FUNCIONA $data PORQUE HEMOS COMPROBADO QUE EXISTE EN EL IF
+
+                    $service->permissions->create($image->ruta_archivo, $permisos);
                 } else {
                     $image->nombre_archivo = $filename; 
                     Gdrive::put("easyshop/images/$filename", $file);
 
                     $updatedData = Gdrive::all("easyshop/images/"); // SI SE USA $data SE OBTENDRÁN LOS DATOS DE ANTES DE GUARDAR EL ARCHIVO
                     $imageId = array_search("easyshop/images/$filename", array_column(json_decode($updatedData, true), 'path'));
-                    $image->ruta_archivo = $updatedData[$imageId]['extra_metadata']['id']; 
+                    $image->ruta_archivo = $updatedData[$imageId]['extra_metadata']['id'];
+
+                    $service->permissions->create($image->ruta_archivo, $permisos);
                 }
                 
                 $image->save();
@@ -93,7 +111,7 @@ class ImageController extends Controller
 
             return response()->json([
                 'result' => 'Imagen guardada.',
-                'data' => $image // ESTO HAY QUE CAMBIARLO POR SU RESOURCE
+                'data' => $image
             ], 201);
 
         } else {

@@ -19,7 +19,8 @@ class ImageResource extends JsonResource
     {
         // Creamos el cliente para autenticarnos en la API de Google Drive
         $client = new Client();
-        // $client->addScope("https://www.googleapis.com/auth/drive"); ESTO ES NECESARIO ??
+        $client->addScope("https://www.googleapis.com/auth/drive");
+        $client->addScope(Drive::DRIVE_READONLY);
         $client->setClientId(config('filesystems.disks.google.clientId'));
         $client->setClientSecret(config('filesystems.disks.google.clientSecret'));
         $accessToken = $client->fetchAccessTokenWithRefreshToken(config('filesystems.disks.google.refreshToken'));

@@ -15,9 +15,9 @@ use App\Http\Controllers\RedsysController;
 |
 */
 
-Route::get('/', function () {
+/* Route::get('/', function () {
     return view('welcome');
-})->name('welcome');
+})->name('welcome'); */
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');

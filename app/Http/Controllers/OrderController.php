@@ -13,14 +13,12 @@ use App\Models\Orderitem;
 use App\Models\Paymentmethod;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Traits\Emailadmin;
 
 class OrderController extends Controller
 {
-    use Emailadmin;
-
     /**
      * Show all orders in storage.
      */
@@ -135,7 +133,7 @@ class OrderController extends Controller
             $product = Product::find($producto['producto']);
             if($product->inventario) {
                 if($product->inventario <= $producto['cantidad']) {
-                    $email = $this->adminEmail(); // Obtenemos el email de administración
+                    $email = Setting::where('configuracion', 'email')->first(); // Obtenemos el email de administración
 
                     $data = array(
                         'producto' => $product->nombre 

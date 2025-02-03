@@ -19,12 +19,10 @@ use App\Http\Requests\EmailverificationRequest;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset; 
-use App\Traits\Emailadmin;
+use App\Models\Setting;
 
 class AuthController extends Controller
 {
-    use Emailadmin;
-
     /**
      * Login ONLY for users with client role.
      */
@@ -93,7 +91,7 @@ class AuthController extends Controller
             'host' => $ubicacion->hostname
         );
 
-        $email = $this->adminEmail(); // Obtenemos el email de administración
+        $email = Setting::where('configuracion', 'email')->first();
         Mail::to($email)->send(new loginAdmin($datos)); // Enviamos correo al admin para notificarle del acceso.
 
         return response()->json([

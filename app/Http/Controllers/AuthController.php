@@ -92,7 +92,7 @@ class AuthController extends Controller
         );
 
         $email = Setting::where('configuracion', 'email')->first();
-        Mail::to($email)->send(new loginAdmin($datos)); // Enviamos correo al admin para notificarle del acceso.
+        Mail::to($email->valor)->send(new loginAdmin($datos)); // Enviamos correo al admin para notificarle del acceso.
 
         return response()->json([
             'status' => true,

@@ -39,7 +39,7 @@ use App\Models\Shippingmethod;
 
 // Gestión de Auth
 Route::post('/userlogin', [AuthController::class, 'loginUser']); // Ruta para iniciar sesión para usuario
-Route::post('/adminlogin', [AuthController::class, 'loginAdmin']); // Ruta para iniciar sesión para administrador
+Route::post('/adminlogin', [AuthController::class, 'loginAdministrador']); // Ruta para iniciar sesión para administrador
 Route::post('/registro', [AuthController::class, 'registroCliente']); // Ruta para crear usuarios con rol de cliente
 Route::middleware('auth:sanctum')->post('/comprobarusuario', [AuthController::class, 'validarTokenA']); // Ruta para comprobar si el usuario está logueado
 Route::middleware('auth:sanctum')->post('/cerrarsesion', [AuthController::class, 'logout']); // Ruta para cerrar sesión y eliminar token. Importante el middleware

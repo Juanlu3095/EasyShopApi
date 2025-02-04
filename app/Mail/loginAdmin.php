@@ -43,7 +43,7 @@ class loginAdmin extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('easyshop.notifications@gmail.com', 'EasyShop Notifications'),
+            from: new Address(config('mail.from.address'), config('mail.from.name')),
             subject: 'Nuevo inicio de sesión con permisos de administración',
         );
     }

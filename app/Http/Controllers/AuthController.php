@@ -53,7 +53,7 @@ class AuthController extends Controller
     /**
      * Login ONLY for users with admin role.
      */
-    public function loginAdmin(LoginRequest $request): JsonResponse {
+    public function loginAdministrador(LoginRequest $request): JsonResponse {
 
         // Intentamos buscar el usuario con la request con el rol de admin
         $auth = Auth::attempt(['email' => $request->email, 'password' => $request->password, 'role_id' => 1]);

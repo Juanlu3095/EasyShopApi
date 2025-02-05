@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\outofstock;
 use App\Mail\pedidotarjeta;
 use App\Models\Error;
+use App\Models\Setting;
 
 class RedsysController extends Controller
 {
@@ -63,13 +64,13 @@ class RedsysController extends Controller
             $product = Product::find($producto['producto']);
             if($product->inventario) {
                 if($product->inventario <= $producto['cantidad']) {
-                    $email = $this->adminEmail(); // Obtenemos el email de administración
+                    $email = Setting::where('configuracion', 'email')->first();
 
                     $data = array(
                         'producto' => $product->nombre 
                     );
 
-                    Mail::to($email)->send(new outofstock($data)); // Mandamos el email a admin si el producto se va a quedar sin existencias
+                    Mail::to($email->valor)->send(new outofstock($data)); // Mandamos el email a admin si el producto se va a quedar sin existencias
                 }
 
                 // Actualizamos el inventario

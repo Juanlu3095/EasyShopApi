@@ -167,7 +167,7 @@ class AuthController extends Controller
 
         //$user->sendEmailVerificationNotification(); // Enviamos correo de verificación
 
-        event(new Registered($user));
+        event(new Registered($user)); // Registra el evento y se envía un correo para verificar al email indicado en la $request
 
         return response()->json([
             'status' => true,
@@ -224,7 +224,7 @@ class AuthController extends Controller
         // $request->fulfill(); // Esta función también estaría mal porque pide que el usuario esté autenticado.
 
         // Redirección al front-end donde nos diga que el usuario se ha verificado.
-        return redirect('http://localhost:4200/emailverificado');
+        return redirect(env('APP_FRONT_URL') . '/emailverificado');
     }
 
     /**
@@ -280,7 +280,7 @@ class AuthController extends Controller
         );
      
         return $status === Password::PASSWORD_RESET
-                    ? redirect('http://localhost:4200/acceso')->with('status', __($status))
+                    ? redirect(env('APP_FRONT_URL') . '/acceso')->with('status', __($status))
                     : back()->withErrors(['email' => [__($status)]]);
     }
 }

@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\newslettersubscription;
 use App\Mail\clientnewsletter;
+use App\Models\Setting;
 
 class NewsletterController extends Controller
 {
@@ -47,7 +48,8 @@ class NewsletterController extends Controller
             'fecha' => $fecha
         );
 
-        Mail::to('jcooldevelopment@gmail.com')->send(new newslettersubscription($datos)); // Enviamos correo al admin para notificarle de la suscripción.
+        $adminEmail = Setting::where('configuracion', 'email')->first();
+        Mail::to($adminEmail->valor)->send(new newslettersubscription($datos)); // Enviamos correo al admin para notificarle de la suscripción.
         Mail::to($email)->send(new clientnewsletter($datos)); // Enviamos correo al cliente para notificarle de la suscripción.
 
         return response()->json([

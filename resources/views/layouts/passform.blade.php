@@ -24,11 +24,11 @@
             @yield('content')
 
             <div class="links">
-                <p><a href="http://localhost:4200">← Volver a EasyShop</a></p>
+                <p><a href="{{ env('APP_FRONT_URL') }}">← Volver a EasyShop</a></p>
             </div>
         
             <div class="politica">
-                <a href="">Política de privacidad</a>
+                <a href="{{ env('APP_FRONT_URL') . '/politica-de-privacidad' }}">Política de privacidad</a>
             </div>
         </section>
     </main>

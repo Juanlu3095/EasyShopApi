@@ -139,7 +139,7 @@ class OrderController extends Controller
                         'producto' => $product->nombre 
                     );
 
-                    Mail::to($email)->send(new outofstock($data)); // Mandamos el email a admin si el producto se va a quedar sin existencias
+                    Mail::to($email->valor)->send(new outofstock($data)); // Mandamos el email a admin si el producto se va a quedar sin existencias
                 }
 
                 // Actualizamos el inventario

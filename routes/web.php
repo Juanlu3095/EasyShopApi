@@ -33,4 +33,4 @@ Route::post('/reset-password', [AuthController::class, 'ResetPassword'])->middle
 
 Route::get('/pagotarjeta/ok', [RedsysController::class, 'ok'])->name('redsys.ok'); // Donde se trata la solicitud con pago Redsys correcto
 Route::get('/pagotarjeta/ko', [RedsysController::class, 'ko'])->name('redsys.ko'); // Donde se trata la solicitud con pago Redsys incorrecto
-Route::post('/pagotarjeta/notification', [RedsysController::class, 'notificaction'])->name('redsys.notification'); // Donde se tratan datos más sensibles con pagos ok
+Route::post('/pagotarjeta/notification', [RedsysController::class, 'notificaction'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->name('redsys.notification'); // Donde se tratan datos más sensibles con pagos ok

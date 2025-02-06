@@ -199,7 +199,7 @@ class RedsysController extends Controller
             } else {
                 Error::create([
                     'funcion' => 'RedsysController@notification',
-                    'mensaje' => 'El pago no se ha realizado.',
+                    'mensaje' => 'El pago del pedido ' . $decode['Ds_Order'] . ' no se ha realizado y se ha obtenido un error con código ' . $decode['Ds_Response'],
                     'archivo' => 'Controllers/RedsysController.php',
                     'linea' => 197
                 ]);

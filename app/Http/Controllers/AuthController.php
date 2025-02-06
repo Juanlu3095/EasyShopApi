@@ -68,7 +68,7 @@ class AuthController extends Controller
         // Si el login es correcto, localizamos el usuario en la base de datos y generamos el token. Luego enviamos email a ADMIN
         $user = User::where('email', $request->email)->first();
 
-        $ip = $request->ip(); // Obtenemos la IP del usuario que realiza la petición
+        $ip = $request->header('X-Forwarded-For') ?? $request->ip(); // Obtenemos la IP del usuario que realiza la petición, si hay proxy obtenemos la auténtica con X-Forwarded-For
         $nombre = $user->name; // Obtenemos el nombre de la request
         $email = $user->email; // Obtenemos el email de la request
 

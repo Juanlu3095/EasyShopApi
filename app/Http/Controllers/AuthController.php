@@ -76,8 +76,8 @@ class AuthController extends Controller
         $fecha = date('d-m-Y H:i'); // Obtenemos la fecha con el timezone indicado arriba
         $browser = $request->header('User-Agent'); // Obtenemos los datos del navegador y/o dispositivo que realiza la petición
 
-        $ubicacionAPI = file_get_contents("http://ipinfo.io/" . '92.177.118.34' . "/json"); // Hacemos petición de geolocalización a la API. Esto es de prueba
-        //$ubicacionAPI = file_get_contents("http://ipinfo.io/{$ip}/json"); // Hacemos petición de geolocalización a la API. Esta sería la versión a poner
+        //$ubicacionAPI = file_get_contents("http://ipinfo.io/" . '92.177.118.34' . "/json"); // Hacemos petición de geolocalización a la API. Esto es de prueba
+        $ubicacionAPI = file_get_contents("http://ipinfo.io/{$ip}/json"); // Hacemos petición de geolocalización a la API. Esta sería la versión a poner
         $ubicacion = json_decode($ubicacionAPI); // Decodificamos el json
 
         $datos = array(

@@ -157,20 +157,9 @@ class RedsysController extends Controller
     }
 
     // Esta función se ejecutará si el pago de Redsys es correcto. Sólo para la redirección al front, sin $request
-    public function ok(Request $request)
+    public function ok()
     {
-        $message = $request->all();
-        $key = config('redsys.key');
-
-        if(isset($message['Ds_MerchantParameters'])) {
-            $decode = json_decode(base64_decode($message['Ds_MerchantParameters']), true);
-            
-            if(Redsys::check($key, $request->input()) && $decode['Ds_Response'] <= 99) { // Verifica Ds_Signature y si el pago se ha realizado
-                RedsysOkEvent::dispatch($decode); // Editamos el estado del pedido y lo ponemos como pagado/confirmado
-                return redirect()->to(env('APP_FRONT_URL'). '/resultado-del-pago/ok');
-            }
-        }
-        return redirect()->to(env('APP_FRONT_URL'). '/resultado-del-pago/error');
+        return redirect()->to(env('APP_FRONT_URL'). '/resultado-del-pago/ok');
     }
 
     // Esta función se ejecutará si el pago de Redsys no es correcto. Sólo para la redirección al front
@@ -198,12 +187,24 @@ class RedsysController extends Controller
             }
         }
         return response()->json(data: ['Success' => false, 'message' => $request->all()]); */
-        Error::create([
-            'funcion' => 'a',
-            'mensaje' => 'a',
-            'archivo' => 'a',
-            'linea' => 1
-        ]);
+        
+        $message = $request->all();
+        $key = config('redsys.key');
+
+        if(isset($message['Ds_MerchantParameters'])) {
+            $decode = json_decode(base64_decode($message['Ds_MerchantParameters']), true);
+            
+            if(Redsys::check($key, $request->input()) && $decode['Ds_Response'] <= 99) { // Verifica Ds_Signature y si el pago se ha realizado
+                RedsysOkEvent::dispatch($decode); // Editamos el estado del pedido y lo ponemos como pagado/confirmado
+            } else {
+                Error::create([
+                    'funcion' => 'RedsysController@notification',
+                    'mensaje' => 'El pago no se ha realizado.',
+                    'archivo' => 'Controllers/RedsysController.php',
+                    'linea' => 197
+                ]);
+            }
+        }
     }
 
 }
